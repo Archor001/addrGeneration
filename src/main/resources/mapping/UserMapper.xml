@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hust.addrgeneration.dao.UserMapper">
+    <insert id="register" parameterType="String">
+        insert into register (NID, userID, phoneNumber, password, userName)
+        values (#{NID}, #{userID}, #{phoneNumber}, #{password}, #{userName})
+    </insert>
+
+    <select id="getKey" parameterType="String" resultType="String">
+        select password from register where NID = #{NID}
+    </select>
+
+    <select id="queryAddrInfo" parameterType="String" resultType="com.hust.addrgeneration.beans.QueryInfo">
+        select userID, phoneNumber, userName from register where NID = #{NID}
+    </select>
+
+    <insert id="updateKey" parameterType="com.hust.addrgeneration.beans.KeyInfo">
+        insert into keyinfo (addrGenIP, ideakey, timehash)
+        values (#{addrGenIP}, #{ideaKey}, #{timeHash})
+    </insert>
+    
+    <select id="getIdeaKey" parameterType="String" resultType="String">
+        select ideakey from keyinfo where addrGenIP = #{addrGenIP} and timehash = #{timeHash}
+    </select>
+
+    <insert id="updateAID" parameterType="String">
+        insert into aidinfo (aid, prefix)
+        values (#{aid}, #{prefix})
+    </insert>
+
+    <select id="getPrefix" parameterType="String" resultType="String">
+        select prefix from aidinfo where aid = #{AID}
+    </select>
+
+    <insert id="updateTimeHash" parameterType="String">
+        insert into timehash (AIDnTH, AID)
+        values (#{AIDnTH}, #{AID})
+    </insert>
+
+    <select id="getAIDnTH" parameterType="String" resultType="String">
+        select AIDnTH from timehash where AID = #{AID}
+    </select>
+
+</mapper>
