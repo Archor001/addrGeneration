@@ -10,6 +10,8 @@ public class InfoBean {
     private String name;
     private String nid;
     private String queryAddress;
+    private String prefix;
+    private String suffix;
 
     public String getQueryAddress() {
         return queryAddress;
@@ -58,4 +60,10 @@ public class InfoBean {
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getPrefix() {return prefix;}
+    public void setPrefix(String prefix) {this.prefix = prefix;}
+
+    public String getSuffix() {return suffix;}
+    public void setSuffix(String suffix) {this.suffix = suffix;}
 }

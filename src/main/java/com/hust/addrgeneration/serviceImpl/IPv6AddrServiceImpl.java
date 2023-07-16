@@ -42,7 +42,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         String phoneNumber = infoBean.getPhoneNumber();
         String userName = infoBean.getName();
 
-        // step1. Calculate NID with user's information
+        // step1. Calculate nid with user's information
         String encryptStr = userID + phoneNumber + userName;
         String hashStr = HashUtils.SM3Hash(encryptStr);
         String userPart = ConvertUtils.hexStringToBinString(hashStr).substring(0,38);
@@ -65,24 +65,29 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
                 break;
         }
     
-        String NID = ConvertUtils.binStringToHexString(userPart + organizationPart);
-        userMapper.register(NID,password,userID,phoneNumber, userName);
+        String nid = ConvertUtils.binStringToHexString(userPart + organizationPart);
+        userMapper.register(nid,password,userID,phoneNumber, userName);
 
-        return NID;
+        return nid;
 
     }
 
     @Override
     public String getAddr(InfoBean infoBean) throws Exception {
-        String NID = infoBean.getNid();
+        String nid = infoBean.getNid();
         String password = infoBean.getPassword();
-        logger.info(NID + password);
-        // step1. check NID and password
+        String prefix = infoBean.getPrefix();
+        String suffix = infoBean.getSuffix();
+        if(suffix == null || suffix.length() == 0)
+            suffix = "1dd2:c65e:8f8b:95b2";
+        logger.info(nid + password);
+        logger.info(prefix + suffix);
+        // step1. check nid and password
         /*
-         if the NID isn't in the database, return the information tells user to register a NID
-         if the NID isn't match the password, return the wrong password information
+         if the nid isn't in the database, return the information tells user to register a nid
+         if the nid isn't match the password, return the wrong password information
          */
-         String passwordFromDB = userMapper.getKey(NID);
+         String passwordFromDB = userMapper.getKey(nid);
         if (!passwordFromDB.equals(password)) {
             throw new Exception("密码错误，请重新输入！");
         }
@@ -96,7 +101,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
         int timeDifference = (int) (( currentTime - baseTime ) / 10);
         String timeInformation = ConvertUtils.decToBinString(timeDifference, 24);
-        String rawAID = NID + ConvertUtils.binStringToHexString(timeInformation);
+        String rawAID = nid + ConvertUtils.binStringToHexString(timeInformation);
 
         // step3. Generate AID-noTimeHash(aka AID_nTH) with UID and time information
         String preAID = EncDecUtils.ideaEncrypt(rawAID, EncDecUtils.ideaKey);
@@ -107,8 +112,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         BigInteger big2 = new BigInteger(str2, 16);
         String AIDnTH = big1.xor(big2).toString(16);
 
-        userMapper.updateAID(AIDnTH, big1.toString(16));
-
+        userMapper.updateAIDnTH(AIDnTH, big1.toString(16));
         // step4. Generate AID-withTimeHash(aka AID) with AIDnTH and time-Hash
         LocalDateTime localDateTime3 = LocalDateTime.of(localDateTime1.getYear(),localDateTime1.getMonth(),localDateTime1.getDayOfMonth(),localDateTime1.getHour(),0,0);
         long nearestTimeHour = localDateTime3.toEpochSecond(ZoneOffset.of("+8"));
@@ -120,12 +124,18 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         String AID = big3.xor(big4).toString(16);
         userMapper.updateTimeHash(AID, AIDnTH);
 
-        StringBuilder suffix = new StringBuilder();
-        for (int i = 0; i < AID.length(); i+=4) {
-            suffix.append(AID, i, i + 4).append(":");
+        // step5. Trunc AID with given prefix length and store to database
+        int prefixLength = prefix.replace(":","").length();
+        String visibleAID = AID.substring(0, 16 - prefixLength);
+        String hiddenAID = AID.substring(16 - prefixLength);
+        String prefix64bits = prefix.replace(":","") + visibleAID;
+        StringBuilder prefix64 = new StringBuilder();
+        for (int i = 0; i < prefix64bits.length(); i+=4) {
+            prefix64.append(prefix64bits, i, i + 4).append(":");
         }
-        String asPrefix = "2001:250:4000:4507:";
-        return asPrefix + suffix.substring(0,suffix.length()-1);
+        String generateAddr = prefix64 + suffix;
+        userMapper.updateTruncAID(generateAddr, visibleAID, hiddenAID, timeDifference);
+        return generateAddr;
     }
 
     @Override
@@ -148,6 +158,8 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
                 "\t\t    {\n" +
                 "\t\t        \"nid\":\"" + userInfo.getNid() + "\",\n" +
                 "\t\t        \"passwd\":\"" + userInfo.getPassword() + "\",\n" +
+                "\t\t        \"prefix\":\"" + userInfo.getPrefix() + "\",\n" +
+                "\t\t        \"suffix\":\"" + userInfo.getSuffix() + "\",\n" +
                 "\t\t        \"subnet_id\" : \"255b0255-ba6a-4820-bf1c-0f5309b9c676\"\n" +
                 "\t\t    }\n" +
                 "\t\t]\n" +
@@ -171,7 +183,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
         
         headers.add("Accept", MediaType.APPLICATION_JSON.toString());
-        headers.add("X-Auth-Token", "gAAAAABkj-zN619wuAG7vNbKubKOoceAhwRYX4ppd2PltQTYrTfhSXpZTwwS3Z-F40K_xRXEBkoHISBrQSNIGsHCGiC9TJazpJ7qSW0eciEhAWHcBeEdWF0Gn5m9nQd2ddwWtL9r8dqpYVedjsI8SgCuNc_n6p56l8FZ9LNfWdFEeYn6_XKNfmw");
+        headers.add("X-Auth-Token", "gAAAAABks9iAQetywwkc0s96HIXdtFMavXbpDvzKeHv4QpYH3n4X3Ty_Jboco_7YEj4vfuBBsez_IJmJ9Na_ho2G_2yhxyify_xN6ekj0gPFQysOlgx_hFM5oKRdAQLt0Cn2Urjo2N7LawxPiXF9wky9fqb1oa54tWjFn3ctSN2SeVNdmwXkB5E");
 
         HttpEntity<String> requestEntity = new HttpEntity<String>(json.toString(), headers);
 
@@ -181,13 +193,16 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     @Override
     public JSONObject queryAddr(InfoBean infoBean) throws Exception {
-        // step1. use prefix of the IPv6-address and calculate time-Hash to get key
-        String queryAddress = infoBean.getQueryAddress();
-        int pos = getIndexOf(queryAddress, ":", 4);
-        String asPrefix = queryAddress.substring(0,pos);
+        // step1. revert AID
+        String queryAddress = infoBean.getQueryAddress().replace(":","");
+        int timeDifference = userMapper.getTruncTime(queryAddress);
+        int prefixLength = infoBean.getPrefix().replace(":","").length();
+        String visibleAID = queryAddress.substring(prefixLength,16);
+        String hiddenAID = userMapper.getTruncAID(visibleAID,timeDifference);
+        String AID = visibleAID + hiddenAID;
+        // step2. use prefix of the IPv6-address and calculate time-Hash to get key
+        String asPrefix = "2001:250:4000:4507";
         String asAddress = asPrefix + "::1";
-        String aidStr = queryAddress.substring(pos+1);
-        String AID = aidStr.replace(":","");
         String AIDnTH = userMapper.getAIDnTH(AID);
         BigInteger big1 = new BigInteger(AID, 16);
         BigInteger big2 = new BigInteger(AIDnTH, 16);
@@ -196,20 +211,20 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         if (ideaKey == null)
             throw new Exception("获取密钥出错！密钥集为空");
 
-        // step2. use suffix of IPv6-address to get the whole encrypt data(128-bits)
-        String prefix = userMapper.getPrefix(AIDnTH);
+        // step3. use suffix of IPv6-address to get the whole encrypt data(128-bits)
+        String prefix = userMapper.getAIDnTHPrefix(AIDnTH);
         BigInteger big3 = new BigInteger(AIDnTH, 16);
         BigInteger big4 = new BigInteger(prefix, 16);
         String suffix = big3.xor(big4).toString(16);
         String preAID = prefix + suffix;
 
-        // step3. use the proper key to decrypt the encrypt data(128-bits)
+        // step4. use the proper key to decrypt the encrypt data(128-bits)
         String rawAID = EncDecUtils.ideaDecrypt(preAID, ideaKey);
         if (rawAID == null || rawAID.length() != 16)
             throw new Exception("解密出错！");
 
-        // step4. use the NID to query user information the return the info(userID, phoneNumber, address-generate-time etc.) to user
-        String NID = rawAID.substring(0,10);
+        // step5. use the nid to query user information the return the info(userID, phoneNumber, address-generate-time etc.) to user
+        String nid = rawAID.substring(0,10);
         String timeInfoStr = ConvertUtils.hexStringToBinString(rawAID.substring(10));
         int timeInfo = Integer.parseInt(timeInfoStr, 2) * 10;
         LocalDateTime localDateTime2 = LocalDateTime.of(LocalDate.now().getYear(), 1, 1, 0, 0, 0);
@@ -217,7 +232,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         long registerTime = (baseTime + timeInfo);
         Instant instant = Instant.ofEpochSecond(registerTime);
         LocalDateTime registerTimeStr = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-        QueryInfo queryInfo = userMapper.queryAddrInfo(NID);
+        QueryInfo queryInfo = userMapper.queryAddrInfo(nid);
         queryInfo.setRegisterTime(registerTimeStr.toString());
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("userID", queryInfo.getUserID());

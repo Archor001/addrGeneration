@@ -2,34 +2,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.hust.addrgeneration.dao.UserMapper">
     <insert id="register" parameterType="String">
-        insert into register (NID, userID, phoneNumber, password, userName)
-        values (#{NID}, #{userID}, #{phoneNumber}, #{password}, #{userName})
+        insert into register (nid, userID, phoneNumber, password, userName)
+        values (#{nid}, #{userID}, #{phoneNumber}, #{password}, #{userName})
     </insert>
 
     <select id="getKey" parameterType="String" resultType="String">
-        select password from register where NID = #{NID}
+        select password from register where nid = #{nid}
     </select>
 
     <select id="queryAddrInfo" parameterType="String" resultType="com.hust.addrgeneration.beans.QueryInfo">
-        select userID, phoneNumber, userName from register where NID = #{NID}
+        select userID, phoneNumber, userName from register where nid = #{nid}
     </select>
 
     <insert id="updateKey" parameterType="com.hust.addrgeneration.beans.KeyInfo">
-        insert into keyinfo (addrGenIP, ideakey, timehash)
+        insert into key_info (addrGenIP, ideakey, timehash)
         values (#{addrGenIP}, #{ideaKey}, #{timeHash})
     </insert>
     
     <select id="getIdeaKey" parameterType="String" resultType="String">
-        select ideakey from keyinfo where addrGenIP = #{addrGenIP} and timehash = #{timeHash}
+        select ideakey from key_info where addrGenIP = #{addrGenIP} and timehash = #{timeHash}
     </select>
 
-    <insert id="updateAID" parameterType="String">
-        insert into aidinfo (aid, prefix)
-        values (#{aid}, #{prefix})
+    <insert id="updateAIDnTH" parameterType="String">
+        insert into aidnth_info (aidnth, prefix)
+        values (#{aidnth}, #{prefix})
     </insert>
 
-    <select id="getPrefix" parameterType="String" resultType="String">
-        select prefix from aidinfo where aid = #{AID}
+    <select id="getAIDnTHPrefix" parameterType="String" resultType="String">
+        select prefix from aidnth_info where aidnth = #{aidnth}
     </select>
 
     <insert id="updateTimeHash" parameterType="String">
@@ -41,4 +41,16 @@
         select AIDnTH from timehash where AID = #{AID}
     </select>
 
+    <insert id="updateTruncAID">
+        insert into aid_trunc_info (address, visibleAID, hiddenAID, timeDifference)
+        values (#{address}, #{visibleAID}, #{hiddenAID}, #{timeDifference})
+    </insert>
+
+    <select id="getTruncAID" resultType="String">
+        select hiddenAID from aid_trunc_info where visibleAID = #{visibleAID} and timeDifference = #{timeDifference}
+    </select>
+
+    <select id="getTruncTime" resultType="int">
+        select timeDifference from aid_trunc_info where address = #{address}
+    </select>
 </mapper>

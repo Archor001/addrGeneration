@@ -4,17 +4,17 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class NidInfo {
-    private String NID;
+    private String nid;
     private String userID;
     private String phoneNumber;
     private String password;
 
-    public String getNID() {
-        return NID;
+    public String getNid() {
+        return nid;
     }
 
-    public void setNID(String NID) {
-        this.NID = NID;
+    public void setNid(String nid) {
+        this.nid = nid;
     }
 
     public String getUserID() {

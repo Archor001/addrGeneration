@@ -9,13 +9,16 @@ import java.util.List;
 
 @Repository
 public interface UserMapper {
-    int register(String NID, String password, String userID, String phoneNumber, String userName);
+    int register(String nid, String password, String userID, String phoneNumber, String userName);
     int updateKey(KeyInfo keyInfo);
-    int updateAID(String aid, String prefix);
+    int updateAIDnTH(String aidnth, String prefix);
     int updateTimeHash(String AID, String AIDnTH);
-    String getKey(String NID);
+    int updateTruncAID(String address, String visibleAID, String hiddenAID, int timeDifference);
+    String getKey(String nid);
     String getAIDnTH(String AID);
-    String getPrefix(String AID);
+    String getAIDnTHPrefix(String aidnth);
     String getIdeaKey(String addrGenIP, String timeHash);
-    QueryInfo queryAddrInfo(String NID);
+    QueryInfo queryAddrInfo(String nid);
+    String getTruncAID(String visibleAID, int timeDifference);
+    int getTruncTime(String address);
 }
