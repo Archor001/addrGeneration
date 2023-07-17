@@ -9,6 +9,7 @@ import com.hust.addrgeneration.service.IPv6AddrService;
 import com.hust.addrgeneration.utils.ConvertUtils;
 import com.hust.addrgeneration.utils.EncDecUtils;
 import com.hust.addrgeneration.utils.HashUtils;
+import com.hust.addrgeneration.utils.NetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -144,7 +145,32 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     }
 
     @Override
-    public String creatPortWithIPv6Addr(InfoBean userInfo) throws Exception {
+    public String creatPortWithIPv6Addr(InfoBean infoBean) throws Exception {
+        // Step1. 检查ISP子网是否存在
+        JSONObject emptyJSON = new JSONObject();
+        JSONObject subnets = getNormalResponse("http://192.168.248.143:9696/v2.0/subnets?tenant_id=1c211c79a8c5437aa478479d1476bfac&network_id=6b9fcbdd-e544-4095-9ac9-efe0f7bab51e", emptyJSON, HttpMethod.GET);
+        String subnetID = "";
+        subnetID = NetUtils.matchSubnet(subnets, infoBean.getPrefix());
+
+        // Step2. 如果不存在ISP子网，则创建ISP子网
+        if(subnetID == ""){
+            String prefix = infoBean.getPrefix();
+            int prefixLength = prefix.replace(":","").length();
+            String subnetCIDR = prefix + "::/" + (prefixLength * 4);
+            String subnetString = "{\n" +
+                    "\t\"subnet\": {\n" +
+                    "\t\t\"tenant_id\": \"1c211c79a8c5437aa478479d1476bfac\",\n" +
+                    "\t\t\"network_id\": \"6b9fcbdd-e544-4095-9ac9-efe0f7bab51e\",\n" +
+                    "\t\t\"ip_version\": 6,\n" +
+                    "\t\t\"cidr\":\"" + subnetCIDR + "\",\n" +
+                    "\t}\n" +
+                    "}";
+            JSONObject subnetReq = JSONObject.parseObject(subnetString);
+            JSONObject subnetRes = getNormalResponse("http://192.168.248.143:9696/v2.0/subnets", subnetReq, HttpMethod.POST);
+            subnetID = subnetRes.getJSONObject("subnet").getString("id");
+        }
+
+        // Step3. 在指定子网下创建port
         JSONObject request = new JSONObject();
         String jsonString = "{\n" +
                 "\t\"port\": {\n" +
@@ -156,34 +182,33 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
                 "\t\t\"propagate_uplink_status\": false,\n" +
                 "\t\t\"fixed_ips\" : [\n" +
                 "\t\t    {\n" +
-                "\t\t        \"nid\":\"" + userInfo.getNid() + "\",\n" +
-                "\t\t        \"passwd\":\"" + userInfo.getPassword() + "\",\n" +
-                "\t\t        \"prefix\":\"" + userInfo.getPrefix() + "\",\n" +
-                "\t\t        \"suffix\":\"" + userInfo.getSuffix() + "\",\n" +
-                "\t\t        \"subnet_id\" : \"255b0255-ba6a-4820-bf1c-0f5309b9c676\"\n" +
+                "\t\t        \"nid\":\"" + infoBean.getNid() + "\",\n" +
+                "\t\t        \"passwd\":\"" + infoBean.getPassword() + "\",\n" +
+                "\t\t        \"prefix\":\"" + infoBean.getPrefix() + "\",\n" +
+                "\t\t        \"suffix\":\"" + infoBean.getSuffix() + "\",\n" +
+                "\t\t        \"subnet_id\":\"" + subnetID + "\",\n" +
                 "\t\t    }\n" +
                 "\t\t]\n" +
                 "\t}\n" +
                 "}";
         request = JSONObject.parseObject(jsonString);
-        JSONObject reply = getNormalResponse("http://192.168.248.143:9696/v2.0/ports", request);
+        JSONObject reply = getNormalResponse("http://192.168.248.143:9696/v2.0/ports", request, HttpMethod.POST);
         portCount++;
         return reply.getJSONObject("port").getJSONArray("fixed_ips").getJSONObject(0).getString("ip_address");
     }
 
-    public static JSONObject getNormalResponse(String url, JSONObject json) throws Exception {
-        return SendPostPacket(url, json);
+    public static JSONObject getNormalResponse(String url, JSONObject json, HttpMethod method) throws Exception {
+        return SendPostPacket(url, json, method);
     }
 
-    private static JSONObject SendPostPacket(String url, JSONObject json) throws Exception {
+    private static JSONObject SendPostPacket(String url, JSONObject json, HttpMethod method) throws Exception {
         RestTemplate client = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        HttpMethod method = HttpMethod.POST;
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
 
-        
         headers.add("Accept", MediaType.APPLICATION_JSON.toString());
-        headers.add("X-Auth-Token", "gAAAAABks9iAQetywwkc0s96HIXdtFMavXbpDvzKeHv4QpYH3n4X3Ty_Jboco_7YEj4vfuBBsez_IJmJ9Na_ho2G_2yhxyify_xN6ekj0gPFQysOlgx_hFM5oKRdAQLt0Cn2Urjo2N7LawxPiXF9wky9fqb1oa54tWjFn3ctSN2SeVNdmwXkB5E");
+        headers.add("X-Auth-Token", "gAAAAABktQhTvQx8lSSC9-PWNC3lTF1KXekC7adKh5oYUJPyAeMfZhJ_IVdsR6v7D2Oem2-atWwxdgh0k6acU4w7nM0cdoXpSNycbW8PvszKBti_aJ2gxH9PCREbLaru4YnEsnbBdN6ggCGrjn9B1FY1N8p5KWpPlhFeolYTpJTV7zoi-PGN71w");
+
 
         HttpEntity<String> requestEntity = new HttpEntity<String>(json.toString(), headers);
 
@@ -194,12 +219,12 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     @Override
     public JSONObject queryAddr(InfoBean infoBean) throws Exception {
         // step1. revert AID
-        String queryAddress = infoBean.getQueryAddress().replace(":","");
-        int timeDifference = userMapper.getTruncTime(queryAddress);
-        int prefixLength = infoBean.getPrefix().replace(":","").length();
-        String visibleAID = queryAddress.substring(prefixLength,16);
-        String hiddenAID = userMapper.getTruncAID(visibleAID,timeDifference);
-        String AID = visibleAID + hiddenAID;
+        String queryAddress = infoBean.getQueryAddress();                                                   // 获取前端查询地址
+        int timeDifference = userMapper.getTruncTime(queryAddress);                                         // 数据库中获取地址生成的时间戳信息
+        int prefixLength = infoBean.getPrefix().replace(":","").length();                  // 获取ISP前缀地址的长度（4bits为一个单位）
+        String visibleAID = queryAddress.replace(":","").substring(prefixLength,16);       // substring(prefixLength,16)表示visibleAID
+        String hiddenAID = userMapper.getTruncAID(visibleAID,timeDifference);                               // 根据visibleAID和时间戳可以在数据库中查到hiddenAID
+        String AID = visibleAID + hiddenAID;                                                                // 溯源的AID
         // step2. use prefix of the IPv6-address and calculate time-Hash to get key
         String asPrefix = "2001:250:4000:4507";
         String asAddress = asPrefix + "::1";
