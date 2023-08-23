@@ -1,27 +1,20 @@
 package com.hust.addrgeneration.beans;
 
-import com.alibaba.fastjson.JSONObject;
-import org.springframework.stereotype.Component;
-
-@Component
-public class NormalMsg {
-
+public class AddressResponse {
     private int code;
     private String msg;
-    private JSONObject info;
-    public NormalMsg(){};
+    private String address;
+    public AddressResponse(){};
 
-    public NormalMsg(int code, String msg, JSONObject info) {
+    public AddressResponse(int code, String msg, String address) {
         this.code = code;
         this.msg = msg;
-        this.info = info;
+        this.address = address;
     }
 
-    public JSONObject getInfo() { return info; }
+    public String getAddress() { return address; }
 
-    public void setInfo(JSONObject info) {
-        this.info = info;
-    }
+    public void setAddress(String address) { this.address = address; }
 
     public int getCode() {
         return code;
@@ -38,5 +31,4 @@ public class NormalMsg {
     public void setMsg(String msg) {
         this.msg = msg;
     }
-
 }

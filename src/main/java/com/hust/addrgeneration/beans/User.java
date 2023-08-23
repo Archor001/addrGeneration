@@ -3,31 +3,20 @@ package com.hust.addrgeneration.beans;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InfoBean {
+public class User {
     private String userID;
     private String password;
     private String phoneNumber;
     private String username;
     private String nid;
-    private String queryAddress;
-    private String prefix;
-    private String suffix;
-
-    public String getQueryAddress() {
-        return queryAddress;
-    }
-
-    public void setQueryAddress(String queryAddress) {
-        this.queryAddress = queryAddress;
-    }
+    private String address;
+    private long registerTime;
 
     public String getNid() {
         return nid;
     }
 
-    public void setNid(String nid) {
-        this.nid = nid;
-    }
+    public void setNid(String nid) { this.nid = nid; }
 
     public String getUserID() {
         return userID;
@@ -60,10 +49,16 @@ public class InfoBean {
     public void setUsername(String username) {
         this.username = username;
     }
-
-    public String getPrefix() {return prefix;}
-    public void setPrefix(String prefix) {this.prefix = prefix;}
-
-    public String getSuffix() {return suffix;}
-    public void setSuffix(String suffix) {this.suffix = suffix;}
+    public String getAddress() {
+        return address;
+    }
+    public void setAddress(String address) {
+        this.address = address;
+    }
+    public long getRegisterTime() {
+        return registerTime;
+    }
+    public void setRegisterTime(long registerTime) {
+        this.registerTime = registerTime;
+    }
 }

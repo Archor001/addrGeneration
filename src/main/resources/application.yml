@@ -16,3 +16,8 @@ spring:
 mybatis:
   mapper-locations: classpath:mapping/*Mapper.xml
   type-aliases-package: com.hust.addrgeneration.beans
+
+#custom configuration
+custom:
+  admin: "root"
+  password: "root@5G"

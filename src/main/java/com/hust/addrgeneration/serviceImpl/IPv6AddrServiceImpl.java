@@ -1,10 +1,8 @@
 package com.hust.addrgeneration.serviceImpl;
 
 import com.alibaba.fastjson.JSONObject;
-import com.hust.addrgeneration.beans.InfoBean;
-import com.hust.addrgeneration.beans.QueryInfo;
+import com.hust.addrgeneration.beans.*;
 import com.hust.addrgeneration.dao.UserMapper;
-import com.hust.addrgeneration.encrypt.IDEAUtils;
 import com.hust.addrgeneration.service.IPv6AddrService;
 import com.hust.addrgeneration.utils.ConvertUtils;
 import com.hust.addrgeneration.utils.EncDecUtils;
@@ -12,12 +10,8 @@ import com.hust.addrgeneration.utils.HashUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.math.BigInteger;
 import java.time.*;
@@ -36,11 +30,14 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     }
 
     @Override
-    public String getNID(InfoBean infoBean) {
-        String userID = infoBean.getUserID();
-        String password = infoBean.getPassword();
-        String phoneNumber = infoBean.getPhoneNumber();
-        String userName = infoBean.getUsername();
+    public ResponseEntity<UserResponse> registerNID(User infoBean) {
+        UserResponse response = new UserResponse();
+
+        User user = infoBean;
+        String userID = user.getUserID();
+        String password = user.getPassword();
+        String phoneNumber = user.getPhoneNumber();
+        String userName = user.getUsername();
 
         // step1. Calculate nid with user's information
         String encryptStr = userID + phoneNumber + userName;
@@ -66,19 +63,29 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         }
 
         String nid = ConvertUtils.binStringToHexString(userPart + organizationPart);
-        userMapper.register(nid,password,userID,phoneNumber, userName);
-
-        return nid;
-
+        user.setNid(nid);
+        try{
+            userMapper.register(nid,password,userID,phoneNumber, userName);
+        } catch (Exception e) {
+            response.setCode(10002);
+            response.setMsg("Register Failed");
+            return new ResponseEntity<UserResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        response.setCode(0);
+        response.setMsg("Success");
+        response.setUser(user);
+        return new ResponseEntity<UserResponse>(response, HttpStatus.OK);
     }
 
     @Override
-    public String createAddr(InfoBean infoBean) throws Exception {
-        String nid = infoBean.getNid();
-        String password = infoBean.getPassword();
-        String prefix = infoBean.getPrefix();
-        String suffix = infoBean.getSuffix();
-        if(suffix == null || suffix.length() == 0)
+    public ResponseEntity<AddressResponse> createAddr(Address addressInfo) throws Exception {
+        AddressResponse response = new AddressResponse();
+
+        String nid = addressInfo.getNid();
+        String password = addressInfo.getPassword();
+        String prefix = addressInfo.getPrefix();
+        String suffix = addressInfo.getSuffix();
+        if(suffix == null || suffix.isEmpty())
             suffix = "1dd2:c65e:8f8b:95b2";
         logger.info(nid + password);
         logger.info(prefix + suffix);
@@ -87,9 +94,19 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
          if the nid isn't in the database, return the information tells user to register a nid
          if the nid isn't match the password, return the wrong password information
          */
-        String passwordFromDB = userMapper.getKey(nid);
+        try{
+            userMapper.queryRegisterInfo(nid);
+        } catch (Exception e){
+            response.setCode(10006);
+            response.setMsg("缺少NID，请注册");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        String passwordFromDB = userMapper.queryRegisterPassword(nid);
         if (!passwordFromDB.equals(password)) {
-            throw new Exception("密码错误，请重新输入！");
+            response.setCode(10005);
+            response.setMsg("密码错误");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         // step2. Calculate the time information
@@ -105,6 +122,12 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
         // step3. Generate AID-noTimeHash(aka AID_nTH) with UID and time information
         String preAID = EncDecUtils.ideaEncrypt(rawAID, EncDecUtils.ideaKey);
+        if(preAID == null || preAID.length() != 32){
+            response.setCode(10009);
+            response.setMsg("加密出错!");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        logger.info(preAID);
         String str1 = preAID.substring(0,16);
         String str2 = preAID.substring(16,32);
 
@@ -112,7 +135,13 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         BigInteger big2 = new BigInteger(str2, 16);
         String AIDnTH = big1.xor(big2).toString(16);
 
-        userMapper.updateAIDnTH(AIDnTH, big1.toString(16));
+        try{
+            userMapper.updateAIDnTH(AIDnTH, big1.toString(16));
+        } catch (Exception e) {
+            response.setCode(10003);
+            response.setMsg("地址生成失败");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         // step4. Generate AID-withTimeHash(aka AID) with AIDnTH and time-Hash
         LocalDateTime localDateTime3 = LocalDateTime.of(localDateTime1.getYear(),localDateTime1.getMonth(),localDateTime1.getDayOfMonth(),localDateTime1.getHour(),0,0);
         long nearestTimeHour = localDateTime3.toEpochSecond(ZoneOffset.of("+8"));
@@ -122,7 +151,13 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         BigInteger big3 = new BigInteger(AIDnTH,16);
         BigInteger big4 = new BigInteger(timeHash, 16);
         String AID = big3.xor(big4).toString(16);
-        userMapper.updateTimeHash(AID, AIDnTH);
+        try{
+            userMapper.updateAID(AID, AIDnTH);
+        } catch (Exception e){
+            response.setCode(10003);
+            response.setMsg("地址生成失败");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         // step5. Trunc AID with given prefix length and store to database
         int prefixLength = prefix.replace(":","").length();
@@ -134,42 +169,59 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             prefix64.append(prefix64bits, i, i + 4).append(":");
         }
         String generateAddr = prefix64 + suffix;
-        userMapper.updateTruncAID(generateAddr, visibleAID, hiddenAID, timeDifference);
-        return generateAddr;
+        try{
+            userMapper.updateAIDTrunc(generateAddr.replace(":",""), visibleAID, hiddenAID, timeDifference, nid, currentTime);
+        } catch (Exception e){
+            response.setCode(10003);
+            response.setMsg("地址生成失败");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        response.setCode(0);
+        response.setMsg("success");
+        response.setAddress(generateAddr);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
     @Override
-    public JSONObject queryAddr(InfoBean infoBean) throws Exception {
+    public ResponseEntity<QueryResponse> queryAddr(Query queryInfo) throws Exception {
+        QueryResponse response = new QueryResponse();
+
         // step1. revert AID
-        String queryAddress = infoBean.getQueryAddress().replace(":","");
-        int timeDifference = userMapper.getTruncTime(queryAddress);
-        int prefixLength = infoBean.getPrefix().replace(":","").length();
+        String queryAddress = queryInfo.getQueryAddress().replace(":","");
+        int timeDifference = userMapper.queryAIDTruncTime(queryAddress);
+        int prefixLength = queryInfo.getPrefix().replace(":","").length();
         String visibleAID = queryAddress.substring(prefixLength,16);
-        String hiddenAID = userMapper.getTruncAID(visibleAID,timeDifference);
+        String hiddenAID = userMapper.queryAIDTruncHiddenAID(visibleAID,timeDifference);
         String AID = visibleAID + hiddenAID;
         // step2. use prefix of the IPv6-address and calculate time-Hash to get key
         String asPrefix = "2001:250:4000:4507";
         String asAddress = asPrefix + "::1";
-        String AIDnTH = userMapper.getAIDnTH(AID);
+        String AIDnTH = userMapper.queryAIDAIDnTH(AID);
         BigInteger big1 = new BigInteger(AID, 16);
         BigInteger big2 = new BigInteger(AIDnTH, 16);
         String timeHash = big1.xor(big2).toString(16);
-        String ideaKey = userMapper.getIdeaKey(asAddress, timeHash);
-        if (ideaKey == null)
-            throw new Exception("获取密钥出错！密钥集为空");
 
         // step3. use suffix of IPv6-address to get the whole encrypt data(128-bits)
-        String prefix = userMapper.getAIDnTHPrefix(AIDnTH);
+        String prefix = userMapper.queryAIDnTHPrefix(AIDnTH);
         BigInteger big3 = new BigInteger(AIDnTH, 16);
         BigInteger big4 = new BigInteger(prefix, 16);
         String suffix = big3.xor(big4).toString(16);
         String preAID = prefix + suffix;
 
         // step4. use the proper key to decrypt the encrypt data(128-bits)
-        String rawAID = EncDecUtils.ideaDecrypt(preAID, ideaKey);
-        if (rawAID == null || rawAID.length() != 16)
-            throw new Exception("解密出错！");
+        String ideakey = userMapper.getIdeaKey(timeHash, asAddress);
+        if (ideakey == null){
+            response.setCode(10007);
+            response.setMsg("获取密钥出错！密钥集为空");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        String rawAID = EncDecUtils.ideaDecrypt(preAID, ideakey);
+        if (rawAID == null || rawAID.length() != 16) {
+            response.setCode(10008);
+            response.setMsg("解密出错!");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         // step5. use the nid to query user information the return the info(userID, phoneNumber, address-generate-time etc.) to user
         String nid = rawAID.substring(0,10);
@@ -180,14 +232,18 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         long registerTime = (baseTime + timeInfo);
         Instant instant = Instant.ofEpochSecond(registerTime);
         LocalDateTime registerTimeStr = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
-        QueryInfo queryInfo = userMapper.queryAddrInfo(nid);
-        queryInfo.setRegisterTime(registerTimeStr.toString());
+
+        User userInfo = userMapper.queryRegisterInfo(nid);
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("userID", queryInfo.getUserID());
-        jsonObject.put("phoneNumber", queryInfo.getPhoneNumber());
-        jsonObject.put("registerTime", queryInfo.getRegisterTime());
-        jsonObject.put("username", queryInfo.getUsername());
-        return jsonObject;
+        jsonObject.put("userID", userInfo.getUserID());
+        jsonObject.put("phoneNumber", userInfo.getPhoneNumber());
+        jsonObject.put("registerTime", registerTimeStr.toString());
+        jsonObject.put("username", userInfo.getUsername());
+
+        response.setCode(0);
+        response.setMsg("success");
+        response.setInfo(jsonObject);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     private int getIndexOf(String data, String str, int num) {

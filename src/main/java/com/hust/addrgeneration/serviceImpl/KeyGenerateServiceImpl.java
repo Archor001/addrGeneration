@@ -1,13 +1,11 @@
 package com.hust.addrgeneration.serviceImpl;
 
-import com.hust.addrgeneration.beans.KeyInfo;
 import com.hust.addrgeneration.dao.UserMapper;
 import com.hust.addrgeneration.encrypt.IDEAUtils;
 import com.hust.addrgeneration.utils.ConvertUtils;
 import com.hust.addrgeneration.utils.EncDecUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -36,7 +34,8 @@ public class KeyGenerateServiceImpl {
         long baseTime = localDateTime2.toEpochSecond(ZoneOffset.of("+8"));
         int timeInfo = (int) (currentTime - baseTime);
         String timeHash = EncDecUtils.md5Encrypt16(ConvertUtils.decToHexString(timeInfo,10));
-        String ideaKey = userMapper.getIdeaKey("2001:250:4000:4507::1", timeHash);
+        String genAddrIP = "2001:250:4000:4507::1";
+        String ideaKey = userMapper.getIdeaKey(timeHash, genAddrIP);
         if (ideaKey != null) {
             EncDecUtils.ideaKey = ideaKey;
             return true;
@@ -60,11 +59,7 @@ public class KeyGenerateServiceImpl {
         logger.info("时间" + timeInfo);
         String genAddrIP = "2001:250:4000:4507::1";
 
-        KeyInfo keyInfo =new KeyInfo();
-        keyInfo.setAddrGenIP(genAddrIP);
-        keyInfo.setIdeaKey(EncDecUtils.ideaKey);
-        keyInfo.setTimeHash(timeHash);
-        userMapper.updateKey(keyInfo);
+        userMapper.updateKey(genAddrIP, EncDecUtils.ideaKey, timeHash);
     }
 
 }

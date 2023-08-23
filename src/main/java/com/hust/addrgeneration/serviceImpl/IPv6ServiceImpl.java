@@ -1,14 +1,12 @@
 package com.hust.addrgeneration.serviceImpl;
 
-import com.hust.addrgeneration.beans.InfoBean;
-import com.hust.addrgeneration.encrypt.SM2.SM2Utils;
+import com.hust.addrgeneration.beans.User;
 import com.hust.addrgeneration.service.IPv6Service;
 import com.hust.addrgeneration.utils.ConvertUtils;
 import com.hust.addrgeneration.utils.EncDecUtils;
 import com.hust.addrgeneration.utils.HashUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -20,7 +18,7 @@ public class IPv6ServiceImpl implements IPv6Service {
     private static final Logger logger = LoggerFactory.getLogger(IPv6ServiceImpl.class);
 
     @Override
-    public String ipv6AddrGeneration(InfoBean userInfo) throws Exception {
+    public String ipv6AddrGeneration(User userInfo) throws Exception {
         String userID = userInfo.getUserID();
         String passwd = userInfo.getPassword();
         String phoneNumber = userInfo.getPhoneNumber();
@@ -85,7 +83,7 @@ public class IPv6ServiceImpl implements IPv6Service {
     }
 
     @Override
-    public String ipv6AddrRebind(InfoBean userInfo) {
+    public String ipv6AddrRebind(User userInfo) {
         return null;
     }
 
