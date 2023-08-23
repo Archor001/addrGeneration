@@ -4,21 +4,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.hust.addrgeneration.beans.InfoBean;
 import com.hust.addrgeneration.beans.NormalMsg;
 import com.hust.addrgeneration.beans.QueryInfo;
-import com.hust.addrgeneration.beans.RegisterInfo;
 import com.hust.addrgeneration.service.IPv6AddrService;
 import com.hust.addrgeneration.service.IPv6Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-
-@Controller
-@CrossOrigin
+@RestController
 public class AddrGeneration {
     private final IPv6Service ipv6Service;
     private final IPv6AddrService iPv6AddrService;
@@ -29,93 +21,65 @@ public class AddrGeneration {
         this.iPv6AddrService = iPv6AddrService;
     }
 
-    @RequestMapping(value = "/register")
-    @ResponseBody
-    public RegisterInfo register(@RequestBody InfoBean userInfo) throws Exception {
-        RegisterInfo backHtml = new RegisterInfo();
+    @PutMapping(value = "/user/nid")
+    public NormalMsg register(@RequestBody InfoBean userInfo) throws Exception {
+        NormalMsg response = new NormalMsg();
         try {
             String NID = iPv6AddrService.getNID(userInfo);
-            backHtml.setStatus(1);
-            backHtml.setMessage("用户注册成功！已成功分配");
-            JSONObject info = new JSONObject();
-            info.put("nid", NID);
-            info.put("userID", userInfo.getUserID());
-            info.put("name", userInfo.getName());
-            backHtml.setInfo(info);
-            return backHtml;
+            response.setCode(200);
+            response.setMsg("用户注册成功！已成功分配");
+            JSONObject data = new JSONObject();
+            data.put("nid", NID);
+            data.put("phoneNumber", userInfo.getPhoneNumber());
+            data.put("userID", userInfo.getUserID());
+            data.put("username", userInfo.getUsername());
+            response.setInfo(data);
+            return response;
         } catch (Exception e) {
-            backHtml.setStatus(0);
-            backHtml.setMessage(e.getMessage());
-            return backHtml;
+            response.setCode(10002);
+            response.setMsg(e.getMessage());
+            return response;
         }
     }
 
-    @RequestMapping(value = "/creatPortWithRealIPv6Addr")
-    @ResponseBody
+    @PostMapping(value = "/user/address")
     public NormalMsg creatPort(@RequestBody InfoBean userInfo) throws Exception {
-        NormalMsg backHtml = new NormalMsg();
+        NormalMsg resp = new NormalMsg();
         try {
-            String addr = iPv6AddrService.creatPortWithIPv6Addr(userInfo);
-            backHtml.setStatus(1);
-            backHtml.setMessage(addr);
-            return backHtml;
+            String addr = iPv6AddrService.createAddr(userInfo);
+            resp.setCode(1);
+            resp.setMsg(addr);
+            return resp;
         } catch (Exception e) {
-            backHtml.setStatus(0);
+            resp.setCode(0);
             if (e.getMessage() == null) {
-                backHtml.setMessage("用户尚未注册！请先注册");
+                resp.setMsg("用户尚未注册！请先注册");
             } else{
-                backHtml.setMessage(e.getMessage());
+                resp.setMsg(e.getMessage());
             }
-            return backHtml;
+            return resp;
         }
     }
 
-    @RequestMapping(value = "/getIPv6Addr")
-    @ResponseBody
-    public NormalMsg generateAddr(@RequestBody InfoBean userInfo) throws Exception {
-        NormalMsg backHtml = new NormalMsg();
+    @GetMapping(value = "/user/address")
+    public NormalMsg queryAddr(@RequestParam InfoBean userInfo) throws Exception {
+        QueryInfo resp = new QueryInfo();
         try {
-            String addr = iPv6AddrService.getAddr(userInfo);
-            backHtml.setStatus(1);
-            backHtml.setMessage(addr);
-            return backHtml;
+            JSONObject data = iPv6AddrService.queryAddr(userInfo);
+            resp.setCode(1);
+            resp.setMsg("地址查询成功");
+            resp.setPhoneNumber(data.getString("phoneNumber"));
+            resp.setRegisterTime(data.getString("registerTime"));
+            resp.setUsername(data.getString("username"));
+            resp.setUserID(data.getString("userID"));
+            return resp;
         } catch (Exception e) {
-            backHtml.setStatus(0);
+            resp.setCode(0);
             if (e.getMessage() == null)
-                backHtml.setMessage("用户尚未注册！请先注册");
+                resp.setMsg("查询地址不存在！");
             else
-                backHtml.setMessage(e.getMessage());
-            return backHtml;
-        }
-    }
-
-    @RequestMapping(value = "/getSubnet")
-    @ResponseBody
-    public NormalMsg generateSubnet(@RequestBody InfoBean userInfo) throws Exception {
-        NormalMsg backHtml = new NormalMsg();
-        return backHtml;
-    }
-
-    @RequestMapping(value = "/query")
-    @ResponseBody
-    public NormalMsg queryAddr(@RequestBody InfoBean userInfo) throws Exception {
-        QueryInfo backHtml = new QueryInfo();
-        try {
-            JSONObject info = iPv6AddrService.queryAddr(userInfo);
-            backHtml.setStatus(1);
-            backHtml.setMessage("地址查询成功");
-            backHtml.setPhoneNumber(info.getString("phoneNumber"));
-            backHtml.setRegisterTime(info.getString("registerTime"));
-            backHtml.setUserName(info.getString("userName"));
-            backHtml.setUserID(info.getString("userID"));
-            return backHtml;
-        } catch (Exception e) {
-            backHtml.setStatus(0);
-            if (e.getMessage() == null)
-                backHtml.setMessage("查询地址不存在！");
-            else
-                backHtml.setMessage(e.getMessage());
-            return backHtml;
+                resp.setMsg(e.getMessage());
+            return resp;
         }
     }
 }

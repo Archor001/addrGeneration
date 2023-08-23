@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.hust.addrgeneration.dao.UserMapper">
     <insert id="register" parameterType="String">
-        insert into register (nid, userID, phoneNumber, password, userName)
-        values (#{nid}, #{userID}, #{phoneNumber}, #{password}, #{userName})
+        insert into register (nid, userID, phoneNumber, password, username)
+        values (#{nid}, #{userID}, #{phoneNumber}, #{password}, #{username})
     </insert>
 
     <select id="getKey" parameterType="String" resultType="String">
@@ -11,7 +11,7 @@
     </select>
 
     <select id="queryAddrInfo" parameterType="String" resultType="com.hust.addrgeneration.beans.QueryInfo">
-        select userID, phoneNumber, userName from register where nid = #{nid}
+        select userID, phoneNumber, username from register where nid = #{nid}
     </select>
 
     <insert id="updateKey" parameterType="com.hust.addrgeneration.beans.KeyInfo">

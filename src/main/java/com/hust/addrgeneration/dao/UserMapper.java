@@ -9,7 +9,7 @@ import java.util.List;
 
 @Repository
 public interface UserMapper {
-    int register(String nid, String password, String userID, String phoneNumber, String userName);
+    int register(String nid, String password, String userID, String phoneNumber, String username);
     int updateKey(KeyInfo keyInfo);
     int updateAIDnTH(String aidnth, String prefix);
     int updateTimeHash(String AID, String AIDnTH);

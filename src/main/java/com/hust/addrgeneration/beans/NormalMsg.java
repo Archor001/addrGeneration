@@ -6,30 +6,37 @@ import org.springframework.stereotype.Component;
 @Component
 public class NormalMsg {
 
-    private int status;
-    private String message;
-
+    private int code;
+    private String msg;
+    private JSONObject info;
     public NormalMsg(){};
 
-    public NormalMsg(int status, String message) {
-        this.status = status;
-        this.message = message;
+    public NormalMsg(int code, String msg, JSONObject info) {
+        this.code = code;
+        this.msg = msg;
+        this.info = info;
     }
 
-    public int getStatus() {
-        return status;
+    public JSONObject getInfo() { return info; }
+
+    public void setInfo(JSONObject info) {
+        this.info = info;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public int getCode() {
+        return code;
     }
 
-    public String getMessage() {
-        return message;
+    public void setCode(int code) {
+        this.code = code;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
 }

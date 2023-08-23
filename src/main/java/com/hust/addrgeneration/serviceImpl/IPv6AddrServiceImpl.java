@@ -9,7 +9,6 @@ import com.hust.addrgeneration.service.IPv6AddrService;
 import com.hust.addrgeneration.utils.ConvertUtils;
 import com.hust.addrgeneration.utils.EncDecUtils;
 import com.hust.addrgeneration.utils.HashUtils;
-import com.hust.addrgeneration.utils.NetUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +40,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         String userID = infoBean.getUserID();
         String password = infoBean.getPassword();
         String phoneNumber = infoBean.getPhoneNumber();
-        String userName = infoBean.getName();
+        String userName = infoBean.getUsername();
 
         // step1. Calculate nid with user's information
         String encryptStr = userID + phoneNumber + userName;
@@ -65,7 +64,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
                 organizationPart = "11";
                 break;
         }
-    
+
         String nid = ConvertUtils.binStringToHexString(userPart + organizationPart);
         userMapper.register(nid,password,userID,phoneNumber, userName);
 
@@ -74,7 +73,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     }
 
     @Override
-    public String getAddr(InfoBean infoBean) throws Exception {
+    public String createAddr(InfoBean infoBean) throws Exception {
         String nid = infoBean.getNid();
         String password = infoBean.getPassword();
         String prefix = infoBean.getPrefix();
@@ -88,7 +87,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
          if the nid isn't in the database, return the information tells user to register a nid
          if the nid isn't match the password, return the wrong password information
          */
-         String passwordFromDB = userMapper.getKey(nid);
+        String passwordFromDB = userMapper.getKey(nid);
         if (!passwordFromDB.equals(password)) {
             throw new Exception("密码错误，请重新输入！");
         }
@@ -139,92 +138,16 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         return generateAddr;
     }
 
-    @Override
-    public String getSubnet(InfoBean infoBean) throws Exception {
-        return null;
-    }
-
-    @Override
-    public String creatPortWithIPv6Addr(InfoBean infoBean) throws Exception {
-        // Step1. 检查ISP子网是否存在
-        JSONObject emptyJSON = new JSONObject();
-        JSONObject subnets = getNormalResponse("http://192.168.248.143:9696/v2.0/subnets?tenant_id=1c211c79a8c5437aa478479d1476bfac&network_id=6b9fcbdd-e544-4095-9ac9-efe0f7bab51e", emptyJSON, HttpMethod.GET);
-        String subnetID = "";
-        subnetID = NetUtils.matchSubnet(subnets, infoBean.getPrefix());
-
-        // Step2. 如果不存在ISP子网，则创建ISP子网
-        if(subnetID == ""){
-            String prefix = infoBean.getPrefix();
-            int prefixLength = prefix.replace(":","").length();
-            String subnetCIDR = prefix + "::/" + (prefixLength * 4);
-            String subnetString = "{\n" +
-                    "\t\"subnet\": {\n" +
-                    "\t\t\"tenant_id\": \"1c211c79a8c5437aa478479d1476bfac\",\n" +
-                    "\t\t\"network_id\": \"6b9fcbdd-e544-4095-9ac9-efe0f7bab51e\",\n" +
-                    "\t\t\"ip_version\": 6,\n" +
-                    "\t\t\"cidr\":\"" + subnetCIDR + "\",\n" +
-                    "\t}\n" +
-                    "}";
-            JSONObject subnetReq = JSONObject.parseObject(subnetString);
-            JSONObject subnetRes = getNormalResponse("http://192.168.248.143:9696/v2.0/subnets", subnetReq, HttpMethod.POST);
-            subnetID = subnetRes.getJSONObject("subnet").getString("id");
-        }
-
-        // Step3. 在指定子网下创建port
-        JSONObject request = new JSONObject();
-        String jsonString = "{\n" +
-                "\t\"port\": {\n" +
-                "\t\t\"admin_state_up\": true,\n" +
-                "\t\t\"name\": \"true-port-" + portCount +"\",\n" +
-                "\t\t\"tenant_id\": \"1c211c79a8c5437aa478479d1476bfac\",\n" +
-                "\t\t\"network_id\": \"6b9fcbdd-e544-4095-9ac9-efe0f7bab51e\",\n" +
-                "\t\t\"port_security_enabled\": true,\n" +
-                "\t\t\"propagate_uplink_status\": false,\n" +
-                "\t\t\"fixed_ips\" : [\n" +
-                "\t\t    {\n" +
-                "\t\t        \"nid\":\"" + infoBean.getNid() + "\",\n" +
-                "\t\t        \"passwd\":\"" + infoBean.getPassword() + "\",\n" +
-                "\t\t        \"prefix\":\"" + infoBean.getPrefix() + "\",\n" +
-                "\t\t        \"suffix\":\"" + infoBean.getSuffix() + "\",\n" +
-                "\t\t        \"subnet_id\":\"" + subnetID + "\",\n" +
-                "\t\t    }\n" +
-                "\t\t]\n" +
-                "\t}\n" +
-                "}";
-        request = JSONObject.parseObject(jsonString);
-        JSONObject reply = getNormalResponse("http://192.168.248.143:9696/v2.0/ports", request, HttpMethod.POST);
-        portCount++;
-        return reply.getJSONObject("port").getJSONArray("fixed_ips").getJSONObject(0).getString("ip_address");
-    }
-
-    public static JSONObject getNormalResponse(String url, JSONObject json, HttpMethod method) throws Exception {
-        return SendPostPacket(url, json, method);
-    }
-
-    private static JSONObject SendPostPacket(String url, JSONObject json, HttpMethod method) throws Exception {
-        RestTemplate client = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
-
-        headers.add("Accept", MediaType.APPLICATION_JSON.toString());
-        headers.add("X-Auth-Token", "gAAAAABktQhTvQx8lSSC9-PWNC3lTF1KXekC7adKh5oYUJPyAeMfZhJ_IVdsR6v7D2Oem2-atWwxdgh0k6acU4w7nM0cdoXpSNycbW8PvszKBti_aJ2gxH9PCREbLaru4YnEsnbBdN6ggCGrjn9B1FY1N8p5KWpPlhFeolYTpJTV7zoi-PGN71w");
-
-
-        HttpEntity<String> requestEntity = new HttpEntity<String>(json.toString(), headers);
-
-        String res = client.exchange(url, method, requestEntity, String.class).getBody();
-        return JSONObject.parseObject(res);
-    }
 
     @Override
     public JSONObject queryAddr(InfoBean infoBean) throws Exception {
         // step1. revert AID
-        String queryAddress = infoBean.getQueryAddress();                                                   // 获取前端查询地址
-        int timeDifference = userMapper.getTruncTime(queryAddress);                                         // 数据库中获取地址生成的时间戳信息
-        int prefixLength = infoBean.getPrefix().replace(":","").length();                  // 获取ISP前缀地址的长度（4bits为一个单位）
-        String visibleAID = queryAddress.replace(":","").substring(prefixLength,16);       // substring(prefixLength,16)表示visibleAID
-        String hiddenAID = userMapper.getTruncAID(visibleAID,timeDifference);                               // 根据visibleAID和时间戳可以在数据库中查到hiddenAID
-        String AID = visibleAID + hiddenAID;                                                                // 溯源的AID
+        String queryAddress = infoBean.getQueryAddress().replace(":","");
+        int timeDifference = userMapper.getTruncTime(queryAddress);
+        int prefixLength = infoBean.getPrefix().replace(":","").length();
+        String visibleAID = queryAddress.substring(prefixLength,16);
+        String hiddenAID = userMapper.getTruncAID(visibleAID,timeDifference);
+        String AID = visibleAID + hiddenAID;
         // step2. use prefix of the IPv6-address and calculate time-Hash to get key
         String asPrefix = "2001:250:4000:4507";
         String asAddress = asPrefix + "::1";
@@ -263,7 +186,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         jsonObject.put("userID", queryInfo.getUserID());
         jsonObject.put("phoneNumber", queryInfo.getPhoneNumber());
         jsonObject.put("registerTime", queryInfo.getRegisterTime());
-        jsonObject.put("userName", queryInfo.getUserName());
+        jsonObject.put("username", queryInfo.getUsername());
         return jsonObject;
     }
 

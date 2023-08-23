@@ -7,7 +7,7 @@ public class InfoBean {
     private String userID;
     private String password;
     private String phoneNumber;
-    private String name;
+    private String username;
     private String nid;
     private String queryAddress;
     private String prefix;
@@ -53,12 +53,12 @@ public class InfoBean {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getName() {
-        return name;
+    public String getUsername() {
+        return username;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPrefix() {return prefix;}
