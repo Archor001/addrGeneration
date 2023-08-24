@@ -39,6 +39,14 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         String phoneNumber = user.getPhoneNumber();
         String userName = user.getUsername();
 
+        // step0. Check phoneNumber validation
+        String phoneRegexp = "^((13[0-9])|(14[57])|(15[0-35-9])|(16[2567])|(17[0-8])|(18[0-9])|(19[0-9]))\\d{8}$";
+        if(!Pattern.matches(phoneRegexp,phoneNumber)){
+            response.setCode(10012);
+            response.setMsg("手机号不合规");
+            return new ResponseEntity<UserResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         // step1. Calculate nid with user's information
         String encryptStr = userID + phoneNumber + userName;
         String hashStr = HashUtils.SM3Hash(encryptStr);
@@ -85,10 +93,21 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         String password = addressInfo.getPassword();
         String prefix = addressInfo.getPrefix();
         String suffix = addressInfo.getSuffix();
+        if(prefix == null || prefix.isEmpty())
+            prefix = "2001:0250";
         if(suffix == null || suffix.isEmpty())
             suffix = "1dd2:c65e:8f8b:95b2";
         logger.info(nid + password);
         logger.info(prefix + suffix);
+
+        // step0. check if address is applied
+        String address = userMapper.queryAIDTrunc(nid);
+        if(!address.isEmpty()){
+            response.setCode(10011);
+            response.setMsg("地址已生成，请勿重复申请");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         // step1. check nid and password
         /*
          if the nid isn't in the database, return the information tells user to register a nid

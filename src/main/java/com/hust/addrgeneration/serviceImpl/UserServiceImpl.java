@@ -50,10 +50,12 @@ public class UserServiceImpl implements UserService {
         int limit = um.getLimit();
         String content = um.getContent();
         try{
-            List<User> userList = userMapper.getUsersByFilter(offset, limit);
+            List<User> userList = userMapper.getUsersByFilter(offset, limit, content);
             User[] users = userList.toArray(new User[userList.size()]);
             for(User i : users){
                 String address = i.getAddress();
+                if(address == null || address.isEmpty())
+                    continue;
                 StringBuilder sb = new StringBuilder();
                 for(int len=0;len<address.length();len++){
                     if(len > 0 && len % 4 ==0)
@@ -62,9 +64,11 @@ public class UserServiceImpl implements UserService {
                 }
                 i.setAddress(sb.toString());
             }
+            int userCount = userMapper.getUserCountByFilter(content);
             response.setCode(0);
             response.setMsg("success");
             response.setUsers(users);
+            response.setCount(userCount);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.setCode(10010);

@@ -26,6 +26,7 @@ public interface UserMapper {
     void updateAIDTrunc(String address, String visibleAID, String hiddenAID, int timeDifference, String nid, long registerTime);    // aid_trunc表，新增
     String queryAIDTruncHiddenAID(String visibleAID, int timeDifference);  // aid_trunc表，获取visibleAID、timeDifference对应的hiddenAID
     int queryAIDTruncTime(String address);       // aid_trunc表，获取address对应的timeDifference
+    String queryAIDTrunc(String nid);       // 查询nid对应的address
 
 
     // key表
@@ -33,5 +34,6 @@ public interface UserMapper {
     void updateKey(String addrGenIP, String ideaKey, String timeHash);      // key表，新增密钥
 
     // 联合查询
-    List<User> getUsersByFilter(int offset, int limit);       // 用户管理
+    List<User> getUsersByFilter(int offset, int limit, String content);       // 用户管理
+    int getUserCountByFilter(String content);
 }
