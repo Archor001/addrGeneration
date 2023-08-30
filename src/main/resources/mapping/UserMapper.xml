@@ -14,6 +14,10 @@
         select password from register where nid = #{nid}
     </select>
 
+    <select id="queryPhoneNumber" parameterType="String" resultType="com.hust.addrgeneration.beans.User">
+        select * from register where phoneNumber = #{phoneNumber}
+    </select>
+
     <delete id="deleteUser" parameterType="String">
         delete from register where nid = #{nid}
     </delete>
@@ -37,8 +41,8 @@
     </select>
 
     <insert id="updateAIDTrunc">
-        insert into aid_trunc (address, visibleAID, hiddenAID, timeDifference, nid, registerTime)
-        values (#{address}, #{visibleAID}, #{hiddenAID}, #{timeDifference}, #{nid}, #{registerTime})
+        insert into aid_trunc (address, visibleAID, hiddenAID, timeDifference, nid, registerTime, prefix)
+        values (#{address}, #{visibleAID}, #{hiddenAID}, #{timeDifference}, #{nid}, #{registerTime}, #{prefix})
     </insert>
 
     <select id="queryAIDTruncHiddenAID" resultType="String">
@@ -64,7 +68,7 @@
 
 
     <select id="getUsersByFilter" resultType="com.hust.addrgeneration.beans.User">
-        select register.* , aid_trunc.address, aid_trunc.registerTime from register left join aid_trunc on register.nid = aid_trunc.nid
+        select register.* , aid_trunc.address, aid_trunc.registerTime, aid_trunc.prefix from register left join aid_trunc on register.nid = aid_trunc.nid
         where register.username LIKE CONCAT('%',#{content},'%') OR register.userID LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
     </select>
 

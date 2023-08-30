@@ -11,6 +11,7 @@ public class User {
     private String nid;
     private String address;
     private long registerTime;
+    private String prefix;
 
     public String getNid() {
         return nid;
@@ -60,5 +61,11 @@ public class User {
     }
     public void setRegisterTime(long registerTime) {
         this.registerTime = registerTime;
+    }
+    public String getPrefix() {
+        return prefix;
+    }
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 }

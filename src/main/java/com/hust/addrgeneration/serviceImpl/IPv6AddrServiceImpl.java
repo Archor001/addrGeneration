@@ -47,6 +47,13 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             return new ResponseEntity<UserResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+        User checkUser = userMapper.queryPhoneNumber(phoneNumber);
+        if(checkUser != null ){
+            response.setCode(10015);
+            response.setMsg("此手机号已注册");
+            return new ResponseEntity<UserResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
         // step1. Calculate nid with user's information
         String encryptStr = userID + phoneNumber + userName;
         String hashStr = HashUtils.SM3Hash(encryptStr);
@@ -189,7 +196,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         }
         String generateAddr = prefix64 + suffix;
         try{
-            userMapper.updateAIDTrunc(generateAddr.replace(":",""), visibleAID, hiddenAID, timeDifference, nid, currentTime);
+            userMapper.updateAIDTrunc(generateAddr.replace(":",""), visibleAID, hiddenAID, timeDifference, nid, currentTime, prefix);
         } catch (Exception e){
             response.setCode(10003);
             response.setMsg("地址生成失败");
@@ -208,7 +215,14 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
         // step1. revert AID
         String queryAddress = queryInfo.getQueryAddress().replace(":","");
-        int timeDifference = userMapper.queryAIDTruncTime(queryAddress);
+        int timeDifference = 0;
+        try{
+            timeDifference = userMapper.queryAIDTruncTime(queryAddress);
+        } catch (Exception e) {
+            response.setCode(10016);
+            response.setMsg("查询地址不存在");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         int prefixLength = queryInfo.getPrefix().replace(":","").length();
         String visibleAID = queryAddress.substring(prefixLength,16);
         String hiddenAID = userMapper.queryAIDTruncHiddenAID(visibleAID,timeDifference);
