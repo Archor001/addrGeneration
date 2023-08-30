@@ -21,7 +21,6 @@ import java.util.regex.Pattern;
 @Service
 public class IPv6AddrServiceImpl implements IPv6AddrService {
     private final UserMapper userMapper;
-    private int portCount = 0;
     private static final Logger logger = LoggerFactory.getLogger(IPv6AddrServiceImpl.class);
 
     @Autowired
