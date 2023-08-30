@@ -103,7 +103,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
         // step0. check if address is applied
         String address = userMapper.queryAIDTrunc(nid);
-        if(!address.isEmpty()){
+        if(address != null){
             response.setCode(10011);
             response.setMsg("地址已生成，请勿重复申请");
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -49,6 +49,11 @@ public class AddrGeneration {
         return userService.FilterUsers(um);
     }
 
+    @DeleteMapping(value="/admin/user")
+    public ResponseEntity<UserResponse> deleteUser(@RequestParam("nid") String nid) throws Exception{
+        return userService.DeleteUser(nid);
+    }
+
     // 地址生成
     @PostMapping(value = "/user/address")
     public ResponseEntity<AddressResponse> createAddress(@RequestBody Address addressInfo) throws Exception {

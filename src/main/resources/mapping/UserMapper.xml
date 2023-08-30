@@ -14,6 +14,10 @@
         select password from register where nid = #{nid}
     </select>
 
+    <delete id="deleteUser" parameterType="String">
+        delete from register where nid = #{nid}
+    </delete>
+
     <insert id="updateAID" parameterType="String">
         insert into aid (AIDnTH, AID)
         values (#{AIDnTH}, #{AID})

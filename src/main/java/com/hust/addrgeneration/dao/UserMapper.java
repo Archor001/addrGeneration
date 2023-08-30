@@ -11,6 +11,7 @@ public interface UserMapper {
     void register(String nid, String password, String userID, String phoneNumber, String username);      // register表，注册用户(申请NID)
     User queryRegisterInfo(String nid);    // register表，获取nid对应的username、userID、phoneNumber
     String queryRegisterPassword(String nid);      // register表，获取nid对应的password
+    void deleteUser(String nid);
 
     // aid表
     void updateAID(String AID, String AIDnTH);      // timehash表，新增

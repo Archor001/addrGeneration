@@ -9,4 +9,5 @@ import org.springframework.http.ResponseEntity;
 public interface UserService {
     public ResponseEntity<UserResponse> Login(User userInfo) throws Exception;
     public ResponseEntity<UserManageResponse> FilterUsers(UserManage um) throws Exception;
+    public ResponseEntity<UserResponse> DeleteUser(String nid) throws Exception;
 }

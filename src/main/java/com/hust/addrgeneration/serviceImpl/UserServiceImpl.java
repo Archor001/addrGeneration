@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -49,32 +50,61 @@ public class UserServiceImpl implements UserService {
         int offset = um.getOffset();
         int limit = um.getLimit();
         String content = um.getContent();
+        List<User> userList = new ArrayList<User>();
+
         try{
-            List<User> userList = userMapper.getUsersByFilter(offset, limit, content);
-            User[] users = userList.toArray(new User[userList.size()]);
-            for(User i : users){
-                String address = i.getAddress();
-                if(address == null || address.isEmpty())
-                    continue;
-                StringBuilder sb = new StringBuilder();
-                for(int len=0;len<address.length();len++){
-                    if(len > 0 && len % 4 ==0)
-                        sb.append(":");
-                    sb.append(address.charAt(len));
-                }
-                i.setAddress(sb.toString());
-            }
-            int userCount = userMapper.getUserCountByFilter(content);
-            response.setCode(0);
-            response.setMsg("success");
-            response.setUsers(users);
-            response.setCount(userCount);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            userList = userMapper.getUsersByFilter(offset, limit, content);
         } catch (Exception e) {
             response.setCode(10010);
             response.setMsg("获取用户失败");
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        User[] users = userList.toArray(new User[userList.size()]);
+        for(User i : users){
+            String address = i.getAddress();
+            if(address == null || address.isEmpty())
+                continue;
+            StringBuilder sb = new StringBuilder();
+            for(int len=0;len<address.length();len++){
+                if(len > 0 && len % 4 ==0)
+                    sb.append(":");
+                sb.append(address.charAt(len));
+            }
+            i.setAddress(sb.toString());
+        }
+        int userCount = 0;
+        try{
+            userCount = userMapper.getUserCountByFilter(content);
+        } catch (Exception e){
+            response.setCode(10010);
+            response.setMsg("获取用户失败");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        response.setCode(0);
+        response.setMsg("success");
+        response.setUsers(users);
+        response.setCount(userCount);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<UserResponse> DeleteUser(String nid){
+        UserResponse response = new UserResponse();
+        User user = userMapper.queryRegisterInfo(nid);
+        if(user == null){
+            response.setCode(10014);
+            response.setMsg("此NID对应的用户不存在");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        try{
+            userMapper.deleteUser(nid);
+        } catch(Exception e) {
+            response.setCode(10013);
+            response.setMsg("删除用户失败");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        response.setCode(0);
+        response.setMsg("success");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }
