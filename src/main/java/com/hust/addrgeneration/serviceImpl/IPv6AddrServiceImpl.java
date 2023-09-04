@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 public class IPv6AddrServiceImpl implements IPv6AddrService {
     private final UserMapper userMapper;
     private int portCount = 0;
+    private int stamp = 10;
     private static final Logger logger = LoggerFactory.getLogger(IPv6AddrServiceImpl.class);
 
     @Autowired
@@ -76,13 +77,12 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     public String getAddr(InfoBean infoBean) throws Exception {
         String NID = infoBean.getNid();
         String password = infoBean.getPassword();
-        logger.info(NID + password);
         // step1. check NID and password
         /*
          if the NID isn't in the database, return the information tells user to register a NID
          if the NID isn't match the password, return the wrong password information
          */
-         String passwordFromDB = userMapper.getKey(NID);
+        String passwordFromDB = userMapper.getKey(NID);
         if (!passwordFromDB.equals(password)) {
             throw new Exception("密码错误，请重新输入！");
         }
@@ -94,7 +94,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         long currentTime = localDateTime1.toEpochSecond(ZoneOffset.of("+8"));
         long baseTime = localDateTime2.toEpochSecond(ZoneOffset.of("+8"));
 
-        int timeDifference = (int) (( currentTime - baseTime ) / 10);
+        int timeDifference = (int) (( currentTime - baseTime ) / stamp);
         String timeInformation = ConvertUtils.decToBinString(timeDifference, 24);
         String rawAID = NID + ConvertUtils.binStringToHexString(timeInformation);
 
@@ -107,6 +107,10 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         BigInteger big2 = new BigInteger(str2, 16);
         String AIDnTH = big1.xor(big2).toString(16);
 
+        String prefix = userMapper.getPrefix(AIDnTH);
+        if(prefix != null){
+            throw new Exception("请勿频繁生成地址");
+        }
         userMapper.updateAID(AIDnTH, big1.toString(16));
 
         // step4. Generate AID-withTimeHash(aka AID) with AIDnTH and time-Hash
@@ -117,7 +121,15 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
         BigInteger big3 = new BigInteger(AIDnTH,16);
         BigInteger big4 = new BigInteger(timeHash, 16);
-        String AID = big3.xor(big4).toString(16);
+//        String AID = big3.xor(big4).toString(16);
+//        if(AID.length()<16){    // 前导零
+//            StringBuilder tmp = new StringBuilder();
+//            for(int i=0;i<16-AID.length();i++){
+//                tmp.insert(0,'0');
+//            }
+//            AID = tmp + AID;
+//        }
+        String AID = String.format("%016x", big3.xor(big4));
         userMapper.updateTimeHash(AID, AIDnTH);
 
         StringBuilder suffix = new StringBuilder();
@@ -211,7 +223,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         // step4. use the NID to query user information the return the info(userID, phoneNumber, address-generate-time etc.) to user
         String NID = rawAID.substring(0,10);
         String timeInfoStr = ConvertUtils.hexStringToBinString(rawAID.substring(10));
-        int timeInfo = Integer.parseInt(timeInfoStr, 2) * 10;
+        int timeInfo = Integer.parseInt(timeInfoStr, 2) * stamp;
         LocalDateTime localDateTime2 = LocalDateTime.of(LocalDate.now().getYear(), 1, 1, 0, 0, 0);
         long baseTime = localDateTime2.toEpochSecond(ZoneOffset.of("+8"));
         long registerTime = (baseTime + timeInfo);
