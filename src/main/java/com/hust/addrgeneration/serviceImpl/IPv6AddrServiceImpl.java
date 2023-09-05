@@ -96,16 +96,24 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     public ResponseEntity<AddressResponse> createAddr(Address addressInfo) throws Exception {
         AddressResponse response = new AddressResponse();
 
-        String nid = addressInfo.getNid();
+        String phoneNumber = addressInfo.getPhoneNumber();
         String password = addressInfo.getPassword();
         String prefix = addressInfo.getPrefix();
         String suffix = addressInfo.getSuffix();
+
+        User user = userMapper.queryPhoneNumber(phoneNumber);
+        if(user==null){
+            response.setCode(10011);
+            response.setMsg("此手机号暂时未申请NID");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        String nid = user.getNid();
+
         if(prefix == null || prefix.isEmpty())
             prefix = "2001:0250";
         if(suffix == null || suffix.isEmpty())
             suffix = "1dd2:c65e:8f8b:95b2";
-        logger.info(nid + password);
-        logger.info(prefix + suffix);
 
         // step0. check if address is applied
         String address = userMapper.queryAIDTrunc(nid);

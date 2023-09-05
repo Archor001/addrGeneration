@@ -1,14 +1,14 @@
 package com.hust.addrgeneration.beans;
 
 public class Address {
-    private String nid;
+    private String phoneNumber;
     private String password;
     private String prefix;
     private String suffix;
 
-    public String getNid() { return nid; }
+    public String getPhoneNumber() { return phoneNumber; }
 
-    public void setNid(String nid) { this.nid = nid; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 
     public String getPassword() { return password; }
 
