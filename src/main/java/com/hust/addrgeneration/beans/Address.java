@@ -4,7 +4,6 @@ public class Address {
     private String phoneNumber;
     private String password;
     private String prefix;
-    private String suffix;
 
     public String getPhoneNumber() { return phoneNumber; }
 
@@ -17,7 +16,4 @@ public class Address {
 
     public String getPrefix() { return prefix; }
     public void setPrefix(String prefix) { this.prefix = prefix; }
-
-    public String getSuffix() { return suffix; }
-    public void setSuffix(String suffix) { this.suffix = suffix; }
 }

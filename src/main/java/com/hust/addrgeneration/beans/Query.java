@@ -2,12 +2,12 @@ package com.hust.addrgeneration.beans;
 
 public class Query {
     private String queryAddress;
-    private String prefix;
+    private int prefixLength;
     public String getQueryAddress() { return queryAddress; }
 
     public void setQueryAddress(String queryAddress) { this.queryAddress = queryAddress; }
 
-    public String getPrefix() { return prefix; }
+    public int getPrefixLength() { return prefixLength; }
 
-    public void setPrefix(String prefix) { this.prefix = prefix; }
+    public void setPrefixLength(int prefixLength) { this.prefixLength = prefixLength; }
 }

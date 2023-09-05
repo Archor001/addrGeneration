@@ -62,10 +62,10 @@ public class AddrGeneration {
 
     // 地址查询
     @GetMapping(value = "/user/address")
-    public ResponseEntity<QueryResponse> queryAddr(@RequestParam("queryAddress") String queryAddress, @RequestParam("prefix") String prefix) throws Exception {
+    public ResponseEntity<QueryResponse> queryAddr(@RequestParam("queryAddress") String queryAddress, @RequestParam("prefixLength") int prefixLength) throws Exception {
         Query queryInfo = new Query();
         queryInfo.setQueryAddress(queryAddress);
-        queryInfo.setPrefix(prefix);
+        queryInfo.setPrefixLength(prefixLength);
         return iPv6AddrService.queryAddr(queryInfo);
     }
 }

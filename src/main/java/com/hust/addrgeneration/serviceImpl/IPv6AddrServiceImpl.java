@@ -99,7 +99,6 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         String phoneNumber = addressInfo.getPhoneNumber();
         String password = addressInfo.getPassword();
         String prefix = addressInfo.getPrefix();
-        String suffix = addressInfo.getSuffix();
 
         User user = userMapper.queryPhoneNumber(phoneNumber);
         if(user==null){
@@ -112,8 +111,6 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
         if(prefix == null || prefix.isEmpty())
             prefix = "2001:0250";
-        if(suffix == null || suffix.isEmpty())
-            suffix = "1dd2:c65e:8f8b:95b2";
 
         // step0. check if address is applied
         String address = userMapper.queryAIDTrunc(nid);
@@ -202,7 +199,8 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         for (int i = 0; i < prefix64bits.length(); i+=4) {
             prefix64.append(prefix64bits, i, i + 4).append(":");
         }
-        String generateAddr = prefix64 + suffix;
+        prefix64.deleteCharAt(prefix64.length() - 1);
+        String generateAddr = String.valueOf(prefix64);
         try{
             userMapper.updateAIDTrunc(generateAddr.replace(":",""), visibleAID, hiddenAID, timeDifference, nid, currentTime, prefix);
         } catch (Exception e){
@@ -231,7 +229,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             response.setMsg("查询地址不存在");
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        int prefixLength = queryInfo.getPrefix().replace(":","").length();
+        int prefixLength = queryInfo.getPrefixLength();
         String visibleAID = queryAddress.substring(prefixLength,16);
         String hiddenAID = userMapper.queryAIDTruncHiddenAID(visibleAID,timeDifference);
         String AID = visibleAID + hiddenAID;
