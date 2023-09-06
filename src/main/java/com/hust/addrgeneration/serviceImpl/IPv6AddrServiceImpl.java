@@ -37,7 +37,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     }
 
     @Override
-    public String getNID(InfoBean infoBean) {
+    public String getNID(InfoBean infoBean) throws Exception {
         String userID = infoBean.getUserID();
         String password = infoBean.getPassword();
         String phoneNumber = infoBean.getPhoneNumber();
@@ -67,6 +67,10 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         }
     
         String NID = ConvertUtils.binStringToHexString(userPart + organizationPart);
+        QueryInfo info = userMapper.queryAddrInfo(NID);
+        if(info != null){
+            throw new Exception("此用户已经注册NID");
+        }
         userMapper.register(NID,password,userID,phoneNumber, userName);
 
         return NID;

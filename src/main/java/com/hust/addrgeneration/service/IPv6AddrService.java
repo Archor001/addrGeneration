@@ -6,7 +6,7 @@ import com.hust.addrgeneration.beans.QueryInfo;
 import org.springframework.stereotype.Service;
 
 public interface IPv6AddrService {
-    String getNID(InfoBean infoBean);
+    String getNID(InfoBean infoBean) throws Exception;
     String getAddr(InfoBean infoBean) throws Exception;
     JSONObject queryAddr(InfoBean infoBean) throws Exception;
     String getSubnet(InfoBean infoBean) throws Exception;
