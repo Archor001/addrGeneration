@@ -31,7 +31,7 @@ public interface UserMapper {
     String queryAIDTrunc(String nid);       // 查询nid对应的address
 
 
-    // key表
+    // key_info表
     String getIdeaKey(String timeHash, String addrGenIP);   // key表，获取密钥
     void updateKey(String addrGenIP, String ideaKey, String timeHash);      // key表，新增密钥
 
