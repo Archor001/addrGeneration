@@ -50,6 +50,26 @@ public class AddrGeneration {
         }
     }
 
+    @RequestMapping(value = "/delete")
+    @ResponseBody
+    public NormalMsg deleteUser(@RequestBody InfoBean userInfo) throws Exception {
+        NormalMsg backHtml = new NormalMsg();
+        try {
+            String result = iPv6AddrService.deleteUser(userInfo);
+            backHtml.setStatus(1);
+            backHtml.setMessage(result);
+            return backHtml;
+        } catch (Exception e) {
+            backHtml.setStatus(0);
+            if (e.getMessage() == null) {
+                backHtml.setMessage("用户删除失败");
+            } else{
+                backHtml.setMessage(e.getMessage());
+            }
+            return backHtml;
+        }
+    }
+
     @RequestMapping(value = "/creatPortWithRealIPv6Addr")
     @ResponseBody
     public NormalMsg creatPort(@RequestBody InfoBean userInfo) throws Exception {

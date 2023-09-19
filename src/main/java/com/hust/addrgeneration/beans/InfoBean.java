@@ -10,7 +10,7 @@ public class InfoBean {
     private String name;
     private String nid;
     private String queryAddress;
-
+    private String userContent;
     public String getQueryAddress() {
         return queryAddress;
     }
@@ -58,4 +58,8 @@ public class InfoBean {
     public void setName(String name) {
         this.name = name;
     }
+    public String getUserContent() {
+        return userContent;
+    }
+    public void setUserContent(String userContent) {this.userContent = userContent;}
 }

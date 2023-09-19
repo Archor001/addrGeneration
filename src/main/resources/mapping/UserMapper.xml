@@ -6,6 +6,10 @@
         values (#{NID}, #{userID}, #{phoneNumber}, #{password}, #{userName})
     </insert>
 
+    <delete id="delete" parameterType="String">
+        delete from register where NID = #{userContent} or userID = #{userContent}
+    </delete>
+
     <select id="getKey" parameterType="String" resultType="String">
         select password from register where NID = #{NID}
     </select>

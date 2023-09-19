@@ -78,6 +78,17 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     }
 
     @Override
+    public String deleteUser(InfoBean infoBean) throws  Exception {
+        String userContent = infoBean.getUserContent();
+        try{
+            userMapper.delete(userContent);
+        } catch (Exception e){
+            throw new Exception(e);
+        }
+        return "删除成功";
+    }
+
+    @Override
     public String getAddr(InfoBean infoBean) throws Exception {
         String NID = infoBean.getNid();
         String password = infoBean.getPassword();
@@ -125,14 +136,6 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
         BigInteger big3 = new BigInteger(AIDnTH,16);
         BigInteger big4 = new BigInteger(timeHash, 16);
-//        String AID = big3.xor(big4).toString(16);
-//        if(AID.length()<16){    // 前导零
-//            StringBuilder tmp = new StringBuilder();
-//            for(int i=0;i<16-AID.length();i++){
-//                tmp.insert(0,'0');
-//            }
-//            AID = tmp + AID;
-//        }
         String AID = String.format("%016x", big3.xor(big4));
         userMapper.updateTimeHash(AID, AIDnTH);
 
@@ -185,7 +188,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         HttpMethod method = HttpMethod.POST;
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
 
-        
+
         headers.add("Accept", MediaType.APPLICATION_JSON.toString());
         headers.add("X-Auth-Token", "gAAAAABkj-zN619wuAG7vNbKubKOoceAhwRYX4ppd2PltQTYrTfhSXpZTwwS3Z-F40K_xRXEBkoHISBrQSNIGsHCGiC9TJazpJ7qSW0eciEhAWHcBeEdWF0Gn5m9nQd2ddwWtL9r8dqpYVedjsI8SgCuNc_n6p56l8FZ9LNfWdFEeYn6_XKNfmw");
 
