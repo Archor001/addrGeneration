@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 public class IPv6AddrServiceImpl implements IPv6AddrService {
     private final UserMapper userMapper;
     private static final Logger logger = LoggerFactory.getLogger(IPv6AddrServiceImpl.class);
+    private ISPFormat ispPrefix;
 
     @Autowired
     public IPv6AddrServiceImpl(UserMapper userMapper) {
@@ -229,7 +230,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             response.setMsg("查询地址不存在");
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        int prefixLength = queryInfo.getPrefixLength();
+        int prefixLength = ispPrefix.getLength();
         String visibleAID = queryAddress.substring(prefixLength,16);
         String hiddenAID = userMapper.queryAIDTruncHiddenAID(visibleAID,timeDifference);
         String AID = visibleAID + hiddenAID;

@@ -30,11 +30,11 @@ public class AddrGeneration {
         return userService.Login(userInfo);
     }
 
-    // 用户注册(申请NID)
-    @PutMapping(value = "/user/nid")
-    public ResponseEntity<UserResponse> register(@RequestBody User userInfo) throws Exception {
-        return iPv6AddrService.registerNID(userInfo);
-    }
+//    // 用户注册(申请NID)
+//    @PutMapping(value = "/user/nid")
+//    public ResponseEntity<UserResponse> register(@RequestBody User userInfo) throws Exception {
+//        return iPv6AddrService.registerNID(userInfo);
+//    }
 
     // 批量获取用户
     @GetMapping(value="/admin/user")
@@ -49,6 +49,7 @@ public class AddrGeneration {
         return userService.FilterUsers(um);
     }
 
+    // 删除用户
     @DeleteMapping(value="/admin/user")
     public ResponseEntity<UserResponse> deleteUser(@RequestParam("nid") String nid) throws Exception{
         return userService.DeleteUser(nid);
@@ -62,10 +63,9 @@ public class AddrGeneration {
 
     // 地址查询
     @GetMapping(value = "/user/address")
-    public ResponseEntity<QueryResponse> queryAddr(@RequestParam("queryAddress") String queryAddress, @RequestParam("prefixLength") int prefixLength) throws Exception {
+    public ResponseEntity<QueryResponse> queryAddr(@RequestParam("queryAddress") String queryAddress) throws Exception {
         Query queryInfo = new Query();
         queryInfo.setQueryAddress(queryAddress);
-        queryInfo.setPrefixLength(prefixLength);
         return iPv6AddrService.queryAddr(queryInfo);
     }
 }
