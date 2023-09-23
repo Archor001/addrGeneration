@@ -1,0 +1,22 @@
+#server configuration
+server:
+  servlet:
+    context-path: /api
+  port: 2233
+
+#database configuration
+spring:
+  datasource:
+    username: root
+    url: jdbc:mysql://localhost:3306/addr5g
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    password: 132311
+
+#mybatis configuration
+mybatis:
+  mapper-locations: classpath:mapping/*Mapper.xml
+  type-aliases-package: com.hust.addrgeneration.beans
+
+custom:
+  admin: root
+  password: addr5g
