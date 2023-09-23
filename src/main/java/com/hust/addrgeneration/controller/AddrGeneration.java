@@ -56,16 +56,28 @@ public class AddrGeneration {
     }
 
     // 地址生成
-    @PostMapping(value = "/user/address")
+    @PostMapping(value = "/admin/address")
     public ResponseEntity<AddressResponse> createAddress(@RequestBody Address addressInfo) throws Exception {
         return iPv6AddrService.createAddr(addressInfo);
     }
 
     // 地址查询
-    @GetMapping(value = "/user/address")
+    @GetMapping(value = "/admin/address")
     public ResponseEntity<QueryResponse> queryAddr(@RequestParam("queryAddress") String queryAddress) throws Exception {
         Query queryInfo = new Query();
         queryInfo.setQueryAddress(queryAddress);
         return iPv6AddrService.queryAddr(queryInfo);
+    }
+
+    // 修改ISP地址前缀
+    @PostMapping(value = "/admin/isp")
+    public ResponseEntity<Response> updateISP(@RequestBody ISP isp) throws Exception {
+        return iPv6AddrService.updateISP(isp);
+    }
+
+    // 获取ISP地址前缀
+    @GetMapping(value="/admin/isp")
+    public ResponseEntity<ISPResponse> getISP() throws Exception {
+        return iPv6AddrService.getISP();
     }
 }

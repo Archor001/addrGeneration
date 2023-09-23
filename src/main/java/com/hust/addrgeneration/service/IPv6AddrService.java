@@ -8,4 +8,6 @@ public interface IPv6AddrService {
     ResponseEntity<UserResponse> registerNID(User infoBean) throws Exception;
     ResponseEntity<AddressResponse> createAddr(Address address) throws Exception;
     ResponseEntity<QueryResponse> queryAddr(Query query) throws Exception;
+    ResponseEntity<Response> updateISP(ISP isp) throws Exception;
+    ResponseEntity<ISPResponse> getISP() throws Exception;
 }

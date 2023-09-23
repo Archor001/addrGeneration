@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 public class IPv6AddrServiceImpl implements IPv6AddrService {
     private final UserMapper userMapper;
     private static final Logger logger = LoggerFactory.getLogger(IPv6AddrServiceImpl.class);
-    private ISPFormat ispPrefix;
+    private ISP ispPrefix;
 
     @Autowired
     public IPv6AddrServiceImpl(UserMapper userMapper) {
@@ -286,18 +286,27 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    private int getIndexOf(String data, String str, int num) {
-        Pattern pattern = Pattern.compile(str);
-        Matcher matcher = pattern.matcher(data);
+    @Override
+    public ResponseEntity<Response> updateISP(ISP isp) throws Exception{
+        Response response = new Response();
+        String ispStr = isp.getIsp();
+        if(ispStr.contains("::/")){
+            
+        } else {
 
-        int indexNum = 0;
-
-        while (matcher.find()) {
-            indexNum++;
-            if (indexNum == num)
-                break;
         }
+        response.setCode(0);
+        response.setMsg("success");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
-        return matcher.start();
+    @Override
+    public ResponseEntity<ISPResponse> getISP() throws Exception{
+        ISPResponse response = new ISPResponse();
+        response.setIsp(ispPrefix.getIsp());
+        response.setLength(ispPrefix.getLength());
+        response.setCode(0);
+        response.setMsg("success");
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
