@@ -44,6 +44,8 @@ public class ErrorUtils {
                 return "PhoneNumber has not registered NID yet";
             case 10018:
                 return "Please create ISP-prefix in the platform first";
+            case 10019:
+                return "ISP address prefix format is invalid";
             default:
                 return "Unknown";
         }

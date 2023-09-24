@@ -9,8 +9,7 @@ import java.util.List;
 public interface UserMapper {
     // register表
     void register(String nid, String password, String userID, String phoneNumber, String username);      // register表，注册用户(申请NID)
-    User queryRegisterInfo(String nid);    // register表，获取nid对应的username、userID、phoneNumber
-    String queryRegisterPassword(String nid);      // register表，获取nid对应的password
+    User queryRegisterInfo(String nid);    // register表，获取nid对应的username、userID、password、phoneNumber
     User queryPhoneNumber(String phoneNumber);        // 查找phoneNumber对应的user
     void deleteUser(String nid);
 

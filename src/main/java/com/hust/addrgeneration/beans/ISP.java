@@ -11,7 +11,7 @@ public class ISP {
     }
 
     public String getIsp() {
-        return this.isp;
+        return isp;
     }
 
     public void setIsp(String isp) {
@@ -19,7 +19,7 @@ public class ISP {
     }
 
     public int getLength() {
-        return this.length;
+        return length;
     }
 
     public void setLength(int length) {

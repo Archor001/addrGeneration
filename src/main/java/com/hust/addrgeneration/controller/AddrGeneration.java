@@ -28,11 +28,11 @@ public class AddrGeneration {
         return userService.Login(userInfo);
     }
 
-//    // 用户注册(申请NID)
-//    @PutMapping(value = "/user/nid")
-//    public ResponseEntity<UserResponse> register(@RequestBody User userInfo) throws Exception {
-//        return iPv6AddrService.registerNID(userInfo);
-//    }
+    // 用户注册(申请NID)
+    @PutMapping(value = "/admin/register")
+    public ResponseEntity<GenerateAddressResponse> register(@RequestBody User userInfo) throws Exception {
+        return iPv6AddrService.registerNID(userInfo);
+    }
 
     // 批量获取用户
     @GetMapping(value="/admin/user")
@@ -67,7 +67,7 @@ public class AddrGeneration {
         return iPv6AddrService.queryAddr(queryAddressInfo);
     }
 
-    // 修改ISP地址前缀
+    // 修改ISP地址前缀（自动重新生成地址）
     @PostMapping(value = "/admin/isp")
     public ResponseEntity<Response> updateISP(@RequestBody ISP isp) throws Exception {
         return iPv6AddrService.updateISP(isp);
@@ -77,5 +77,11 @@ public class AddrGeneration {
     @GetMapping(value="/admin/isp")
     public ResponseEntity<ISPResponse> getISP() throws Exception {
         return iPv6AddrService.getISP();
+    }
+
+    // 手动重新生成地址
+    @PostMapping(value = "/admin/regen/address")
+    public ResponseEntity<Response> regenerateAddress(@RequestBody ISP isp) throws Exception {
+        return iPv6AddrService.regenAddress(isp);
     }
 }

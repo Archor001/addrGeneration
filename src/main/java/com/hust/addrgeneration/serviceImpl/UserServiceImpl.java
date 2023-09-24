@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.hust.addrgeneration.beans.*;
 import com.hust.addrgeneration.dao.UserMapper;
 import com.hust.addrgeneration.service.UserService;
+import com.hust.addrgeneration.utils.AddressUtils;
+import com.hust.addrgeneration.utils.ISPUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private Custom custom;
+    private ISP ispPrefix = ISPUtils.ispPrefix;
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     public UserServiceImpl(UserMapper userMapper) {
@@ -34,7 +37,7 @@ public class UserServiceImpl implements UserService {
         String username = userInfo.getUsername();
         String password = userInfo.getPassword();
         if( !username.equals(custom.getAdmin()) || !password.equals(custom.getPassword()) ){
-            response.responseError(10005);
+            return response.responseError(10005);
         }
         response.setCode(0);
         response.setMsg("success");
@@ -45,6 +48,12 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<UserManageResponse> FilterUsers(UserManage um) {
         UserManageResponse response = new UserManageResponse();
 
+        if(ispPrefix.getIsp() == null || ispPrefix.getIsp().length() == 0){
+            response.setCode(0);
+            response.setMsg("success");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
         int offset = um.getOffset();
         int limit = um.getLimit();
         String content = um.getContent();
@@ -53,7 +62,7 @@ public class UserServiceImpl implements UserService {
         try{
             userList = userMapper.getUsersByFilter(offset, limit, content);
         } catch (Exception e) {
-            response.responseError(10010);
+            return response.responseError(10010);
         }
         User[] users = userList.toArray(new User[userList.size()]);
         for(User i : users){
@@ -66,13 +75,14 @@ public class UserServiceImpl implements UserService {
                     sb.append(":");
                 sb.append(address.charAt(len));
             }
-            i.setAddress(sb.toString());
+            String displayAddr = AddressUtils.displayAddress(sb.toString());
+            i.setAddress(displayAddr);
         }
         int userCount = 0;
         try{
             userCount = userMapper.getUserCountByFilter(content);
         } catch (Exception e){
-            response.responseError(10010);
+            return response.responseError(10010);
         }
         response.setCode(0);
         response.setMsg("success");
@@ -86,12 +96,12 @@ public class UserServiceImpl implements UserService {
         UserResponse response = new UserResponse();
         User user = userMapper.queryRegisterInfo(nid);
         if(user == null){
-            response.responseError(10014);
+            return response.responseError(10014);
         }
         try{
             userMapper.deleteUser(nid);
         } catch(Exception e) {
-            response.responseError(10013);
+            return response.responseError(10013);
         }
         response.setCode(0);
         response.setMsg("success");

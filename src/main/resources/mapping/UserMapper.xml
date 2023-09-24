@@ -7,11 +7,7 @@
     </insert>
 
     <select id="queryRegisterInfo" parameterType="String" resultType="com.hust.addrgeneration.beans.User">
-        select userID, phoneNumber, username from register where nid = #{nid}
-    </select>
-
-    <select id="queryRegisterPassword" parameterType="String" resultType="String">
-        select password from register where nid = #{nid}
+        select userID, phoneNumber, password, username from register where nid = #{nid}
     </select>
 
     <select id="queryPhoneNumber" parameterType="String" resultType="com.hust.addrgeneration.beans.User">

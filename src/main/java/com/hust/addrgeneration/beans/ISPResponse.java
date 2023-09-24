@@ -7,6 +7,11 @@ import org.springframework.http.ResponseEntity;
 public class ISPResponse extends Response{
     private String isp;
     private int length;
+    public ISPResponse(){};
+    public ISPResponse(String isp, int length){
+        this.isp = isp;
+        this.length = length;
+    }
     public void setIsp(String isp){
         this.isp = isp;
     }

@@ -7,18 +7,22 @@ import org.springframework.http.ResponseEntity;
 public class GenerateAddressResponse {
     private int code;
     private String msg;
+    private User user;
     private String address;
     public GenerateAddressResponse(){};
 
-    public GenerateAddressResponse(int code, String msg, String address) {
+    public GenerateAddressResponse(int code, String msg, User user, String address) {
         this.code = code;
         this.msg = msg;
+        this.user = user;
         this.address = address;
     }
 
     public String getAddress() { return address; }
 
     public void setAddress(String address) { this.address = address; }
+    public User getUser() { return user;}
+    public void setUser(User user) {this.user=user;}
 
     public int getCode() {
         return code;
