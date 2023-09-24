@@ -43,16 +43,12 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         // step0. Check phoneNumber validation
         String phoneRegexp = "^((13[0-9])|(14[57])|(15[0-35-9])|(16[2567])|(17[0-8])|(18[0-9])|(19[0-9]))\\d{8}$";
         if(!Pattern.matches(phoneRegexp,phoneNumber)){
-            response.setCode(10012);
-            response.setMsg("手机号不合规");
-            return new ResponseEntity<UserResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10012);
         }
 
         User checkUser = userMapper.queryPhoneNumber(phoneNumber);
         if(checkUser != null ){
-            response.setCode(10015);
-            response.setMsg("此手机号已注册");
-            return new ResponseEntity<UserResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10015);
         }
 
         // step1. Calculate nid with user's information
@@ -83,9 +79,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         try{
             userMapper.register(nid,password,userID,phoneNumber, userName);
         } catch (Exception e) {
-            response.setCode(10002);
-            response.setMsg("Register Failed");
-            return new ResponseEntity<UserResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10002);
         }
         try{
             GenerateAddress addressInfo = new GenerateAddress();
@@ -93,9 +87,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             addressInfo.setPassword(user.getPassword());
             this.createAddr(addressInfo);
         } catch (Exception e){
-            response.setCode(10003);
-            response.setMsg("地址生成失败");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10003);
         }
         response.setCode(0);
         response.setMsg("Success");
@@ -113,26 +105,20 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
         User user = userMapper.queryPhoneNumber(phoneNumber);
         if(user==null){
-            response.setCode(10011);
-            response.setMsg("此手机号暂时未申请NID");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10004);
         }
 
         String nid = user.getNid();
 
         // 如果没有ISP
         if(prefix == null || prefix.isEmpty()){
-            response.setCode(10018);
-            response.setMsg("未创建ISP，请前往平台界面创建ISP");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10018);
         }
 
         // step0. check if address is applied
         String address = userMapper.queryAIDTrunc(nid);
         if(address != null){
-            response.setCode(10011);
-            response.setMsg("地址已生成，请勿重复申请");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10011);
         }
 
         // step1. check nid and password
@@ -143,16 +129,12 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         try{
             userMapper.queryRegisterInfo(nid);
         } catch (Exception e){
-            response.setCode(10006);
-            response.setMsg("缺少NID，请注册");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10017);
         }
 
         String passwordFromDB = userMapper.queryRegisterPassword(nid);
         if (!passwordFromDB.equals(password)) {
-            response.setCode(10005);
-            response.setMsg("密码错误");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10005);
         }
 
         // step2. Calculate the time information
@@ -169,9 +151,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         // step3. Generate AID-noTimeHash(aka AID_nTH) with UID and time information
         String preAID = EncDecUtils.ideaEncrypt(rawAID, EncDecUtils.ideaKey);
         if(preAID == null || preAID.length() != 32){
-            response.setCode(10009);
-            response.setMsg("加密出错!");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10009);
         }
         logger.info(preAID);
         String str1 = preAID.substring(0,16);
@@ -184,9 +164,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         try{
             userMapper.updateAIDnTH(AIDnTH, big1.toString(16));
         } catch (Exception e) {
-            response.setCode(10003);
-            response.setMsg("地址生成失败");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10003);
         }
         // step4. Generate AID-withTimeHash(aka AID) with AIDnTH and time-Hash
         LocalDateTime localDateTime3 = LocalDateTime.of(localDateTime1.getYear(),localDateTime1.getMonth(),localDateTime1.getDayOfMonth(),localDateTime1.getHour(),0,0);
@@ -200,9 +178,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         try{
             userMapper.updateAID(AID, AIDnTH);
         } catch (Exception e){
-            response.setCode(10003);
-            response.setMsg("地址生成失败");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10003);
         }
 
         // step5. Trunc AID with given prefix length and store to database
@@ -219,9 +195,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         try{
             userMapper.updateAIDTrunc(generateAddr.replace(":",""), visibleAID, hiddenAID, timeDifference, nid, currentTime, prefix);
         } catch (Exception e){
-            response.setCode(10003);
-            response.setMsg("地址生成失败");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10003);
         }
         response.setCode(0);
         response.setMsg("success");
@@ -240,9 +214,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         try{
             timeDifference = userMapper.queryAIDTruncTime(queryAddress);
         } catch (Exception e) {
-            response.setCode(10016);
-            response.setMsg("查询地址不存在");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10016);
         }
         int prefixLength = ispPrefix.getLength();
         String visibleAID = queryAddress.substring(prefixLength,16);
@@ -266,15 +238,11 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         // step4. use the proper key to decrypt the encrypt data(128-bits)
         String ideakey = userMapper.getIdeaKey(timeHash, asAddress);
         if (ideakey == null){
-            response.setCode(10007);
-            response.setMsg("获取密钥出错！密钥集为空");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10007);
         }
         String rawAID = EncDecUtils.ideaDecrypt(preAID, ideakey);
         if (rawAID == null || rawAID.length() != 16) {
-            response.setCode(10008);
-            response.setMsg("解密出错!");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10008);
         }
 
         // step5. use the nid to query user information the return the info(userID, phoneNumber, address-generate-time etc.) to user

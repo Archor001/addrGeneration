@@ -34,9 +34,7 @@ public class UserServiceImpl implements UserService {
         String username = userInfo.getUsername();
         String password = userInfo.getPassword();
         if( !username.equals(custom.getAdmin()) || !password.equals(custom.getPassword()) ){
-            response.setCode(10005);
-            response.setMsg("Wrong Password");
-            return new ResponseEntity<UserResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10005);
         }
         response.setCode(0);
         response.setMsg("success");
@@ -55,9 +53,7 @@ public class UserServiceImpl implements UserService {
         try{
             userList = userMapper.getUsersByFilter(offset, limit, content);
         } catch (Exception e) {
-            response.setCode(10010);
-            response.setMsg("获取用户失败");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10010);
         }
         User[] users = userList.toArray(new User[userList.size()]);
         for(User i : users){
@@ -76,9 +72,7 @@ public class UserServiceImpl implements UserService {
         try{
             userCount = userMapper.getUserCountByFilter(content);
         } catch (Exception e){
-            response.setCode(10010);
-            response.setMsg("获取用户失败");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10010);
         }
         response.setCode(0);
         response.setMsg("success");
@@ -92,16 +86,12 @@ public class UserServiceImpl implements UserService {
         UserResponse response = new UserResponse();
         User user = userMapper.queryRegisterInfo(nid);
         if(user == null){
-            response.setCode(10014);
-            response.setMsg("此NID对应的用户不存在");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10014);
         }
         try{
             userMapper.deleteUser(nid);
         } catch(Exception e) {
-            response.setCode(10013);
-            response.setMsg("删除用户失败");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+            response.responseError(10013);
         }
         response.setCode(0);
         response.setMsg("success");

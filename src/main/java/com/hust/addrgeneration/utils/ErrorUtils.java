@@ -9,13 +9,13 @@ public class ErrorUtils {
     public static String message(int code) {
         switch (code) {
             case 10001:
-                return "需要登录";
+                return "Need Login";
             case 10002:
                 return "Register Failed";
             case 10003:
                 return "Address Generation Failed";
             case 10004:
-                return "需要登录";
+                return "PhoneNumber has not been registered";
             case 10005:
                 return "Wrong password";
             case 10006:
@@ -29,7 +29,7 @@ public class ErrorUtils {
             case 10010:
                 return "Failed to get user";
             case 10011:
-                return "current phoneNumber has not applied address yet";
+                return "current phoneNumber has already applied address";
             case 10012:
                 return "invalid phoneNumber";
             case 10013:
@@ -41,17 +41,11 @@ public class ErrorUtils {
             case 10016:
                 return "QueryAddress doesn't exist";
             case 10017:
-                return "需要登录";
+                return "PhoneNumber has not registered NID yet";
             case 10018:
                 return "Please create ISP-prefix in the platform first";
-            case 10019:
-                return "需要登录";
-            case 10020:
-                return "需要登录";
-            case 10021:
-                return "需要登录";
             default:
-                return "未知错误";
+                return "Unknown";
         }
     }
 }
