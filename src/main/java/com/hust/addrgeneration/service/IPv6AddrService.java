@@ -9,5 +9,5 @@ public interface IPv6AddrService {
     ResponseEntity<QueryAddressResponse> queryAddr(QueryAddress queryAddress) throws Exception;
     ResponseEntity<Response> updateISP(ISP isp) throws Exception;
     ResponseEntity<ISPResponse> getISP() throws Exception;
-    ResponseEntity<Response> regenAddress(ISP isp) throws Exception;
+    ResponseEntity<Response> regenAddress() throws Exception;
 }

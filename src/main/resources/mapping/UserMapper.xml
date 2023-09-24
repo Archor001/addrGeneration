@@ -18,6 +18,10 @@
         delete from register where nid = #{nid}
     </delete>
 
+    <select id="getAllRegisteredUsers" resultType="com.hust.addrgeneration.beans.User">
+        select * from register
+    </select>
+
     <insert id="updateAID" parameterType="String">
         insert into aid (AIDnTH, AID)
         values (#{AIDnTH}, #{AID})
@@ -40,6 +44,10 @@
         insert into aid_trunc (address, visibleAID, hiddenAID, timeDifference, nid, registerTime, prefix)
         values (#{address}, #{visibleAID}, #{hiddenAID}, #{timeDifference}, #{nid}, #{registerTime}, #{prefix})
     </insert>
+
+    <delete id="truncateAIDTrunc">
+        truncate table aid_trunc
+    </delete>
 
     <select id="queryAIDTruncHiddenAID" resultType="String">
         select hiddenAID from aid_trunc where visibleAID = #{visibleAID} and timeDifference = #{timeDifference}

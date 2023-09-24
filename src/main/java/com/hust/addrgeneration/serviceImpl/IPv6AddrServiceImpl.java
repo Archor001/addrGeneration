@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.time.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 @Service
@@ -26,6 +28,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         this.userMapper = userMapper;
     }
 
+    // 创建用户(注册NID+地址生成)
     @Override
     public ResponseEntity<GenerateAddressResponse> registerNID(User infoBean) {
         GenerateAddressResponse response = new GenerateAddressResponse();
@@ -95,6 +98,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         }
     }
 
+    // 地址生成
     @Override
     public ResponseEntity<GenerateAddressResponse> createAddr(GenerateAddress addressInfo) throws Exception {
         GenerateAddressResponse response = new GenerateAddressResponse();
@@ -203,6 +207,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     }
 
 
+    // 地址查询
     @Override
     public ResponseEntity<QueryAddressResponse> queryAddr(QueryAddress queryAddressInfo) throws Exception {
         QueryAddressResponse response = new QueryAddressResponse();
@@ -271,6 +276,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    // 修改ISP(更新ISP+重新生成地址)
     @Override
     public ResponseEntity<Response> updateISP(ISP isp) throws Exception{
         Response response = new Response();
@@ -287,13 +293,21 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         } else {
             length = AddressUtils.getAddressBitLength(ispStr);
         }
-        ispPrefix.setIsp(ispStr);
-        ispPrefix.setLength(length);
+        // 如果之前存在ISP，说明是修改操作，需要重新生成地址
+        if(ispPrefix.getIsp() != null){
+            ispPrefix.setIsp(ispStr);
+            ispPrefix.setLength(length);
+            this.regenAddress();
+        } else {
+            ispPrefix.setIsp(ispStr);
+            ispPrefix.setLength(length);
+        }
         response.setCode(0);
         response.setMsg("success");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    // 获取ISP地址
     @Override
     public ResponseEntity<ISPResponse> getISP() throws Exception{
         ISPResponse response = new ISPResponse();
@@ -304,9 +318,37 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    // 重新生成地址
     @Override
-    public ResponseEntity<Response> regenAddress(ISP isp) throws Exception {
+    public ResponseEntity<Response> regenAddress() throws Exception {
         Response response = new Response();
+
+        // 截断地址表
+        try{
+            userMapper.truncateAIDTrunc();
+        } catch (Exception e){
+            return response.responseNormalError(10020);
+        }
+
+        // 获取全部register表信息，逐个生成地址
+        List<User> userList = new ArrayList<User>();
+        try{
+            userList = userMapper.getAllRegisteredUsers();
+        } catch (Exception e){
+            return response.responseNormalError(10020);
+        }
+        User[] users = userList.toArray(new User[userList.size()]);
+        for(User i : users){
+            try{
+                GenerateAddress addressInfo = new GenerateAddress();
+                addressInfo.setPhoneNumber(i.getPhoneNumber());
+                addressInfo.setPassword(i.getPassword());
+                this.createAddr(addressInfo);
+            } catch (Exception e){
+                response.responseNormalError(10020);
+            }
+        }
+
         response.setCode(0);
         response.setMsg("success");
         return new ResponseEntity<>(response, HttpStatus.OK);

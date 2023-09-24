@@ -81,7 +81,7 @@ public class AddrGeneration {
 
     // 手动重新生成地址
     @PostMapping(value = "/admin/regen/address")
-    public ResponseEntity<Response> regenerateAddress(@RequestBody ISP isp) throws Exception {
-        return iPv6AddrService.regenAddress(isp);
+    public ResponseEntity<Response> regenerateAddress() throws Exception {
+        return iPv6AddrService.regenAddress();
     }
 }

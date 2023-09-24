@@ -11,7 +11,8 @@ public interface UserMapper {
     void register(String nid, String password, String userID, String phoneNumber, String username);      // register表，注册用户(申请NID)
     User queryRegisterInfo(String nid);    // register表，获取nid对应的username、userID、password、phoneNumber
     User queryPhoneNumber(String phoneNumber);        // 查找phoneNumber对应的user
-    void deleteUser(String nid);
+    void deleteUser(String nid);           // 删除nid对应的用户
+    List<User> getAllRegisteredUsers();     // 获取全部用户
 
     // aid表
     void updateAID(String AID, String AIDnTH);      // timehash表，新增
@@ -28,6 +29,7 @@ public interface UserMapper {
     String queryAIDTruncHiddenAID(String visibleAID, int timeDifference);  // aid_trunc表，获取visibleAID、timeDifference对应的hiddenAID
     int queryAIDTruncTime(String address);       // aid_trunc表，获取address对应的timeDifference
     String queryAIDTrunc(String nid);       // 查询nid对应的address
+    void truncateAIDTrunc();                // 截断地址表
 
 
     // key_info表

@@ -46,6 +46,8 @@ public class ErrorUtils {
                 return "Please create ISP-prefix in the platform first";
             case 10019:
                 return "ISP address prefix format is invalid";
+            case 10020:
+                return "regenerate address failed";
             default:
                 return "Unknown";
         }
