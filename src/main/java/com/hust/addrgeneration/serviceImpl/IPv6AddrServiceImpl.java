@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.hust.addrgeneration.beans.*;
 import com.hust.addrgeneration.dao.UserMapper;
 import com.hust.addrgeneration.service.IPv6AddrService;
+import com.hust.addrgeneration.utils.AddressUtils;
 import com.hust.addrgeneration.utils.ConvertUtils;
 import com.hust.addrgeneration.utils.EncDecUtils;
 import com.hust.addrgeneration.utils.HashUtils;
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.time.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
@@ -87,6 +87,16 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             response.setMsg("Register Failed");
             return new ResponseEntity<UserResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+        try{
+            GenerateAddress addressInfo = new GenerateAddress();
+            addressInfo.setPhoneNumber(user.getPhoneNumber());
+            addressInfo.setPassword(user.getPassword());
+            this.createAddr(addressInfo);
+        } catch (Exception e){
+            response.setCode(10003);
+            response.setMsg("地址生成失败");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
         response.setCode(0);
         response.setMsg("Success");
         response.setUser(user);
@@ -94,12 +104,12 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     }
 
     @Override
-    public ResponseEntity<AddressResponse> createAddr(Address addressInfo) throws Exception {
-        AddressResponse response = new AddressResponse();
+    public ResponseEntity<GenerateAddressResponse> createAddr(GenerateAddress addressInfo) throws Exception {
+        GenerateAddressResponse response = new GenerateAddressResponse();
 
         String phoneNumber = addressInfo.getPhoneNumber();
         String password = addressInfo.getPassword();
-        String prefix = addressInfo.getPrefix();
+        String prefix = ispPrefix.getIsp();
 
         User user = userMapper.queryPhoneNumber(phoneNumber);
         if(user==null){
@@ -110,8 +120,12 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
         String nid = user.getNid();
 
-        if(prefix == null || prefix.isEmpty())
-            prefix = "2001:0250";
+        // 如果没有ISP
+        if(prefix == null || prefix.isEmpty()){
+            response.setCode(10018);
+            response.setMsg("未创建ISP，请前往平台界面创建ISP");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
 
         // step0. check if address is applied
         String address = userMapper.queryAIDTrunc(nid);
@@ -192,7 +206,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         }
 
         // step5. Trunc AID with given prefix length and store to database
-        int prefixLength = prefix.replace(":","").length();
+        int prefixLength = AddressUtils.getAddressBitLength(prefix) / 4;
         String visibleAID = AID.substring(0, 16 - prefixLength);
         String hiddenAID = AID.substring(16 - prefixLength);
         String prefix64bits = prefix.replace(":","") + visibleAID;
@@ -217,11 +231,11 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
 
     @Override
-    public ResponseEntity<QueryResponse> queryAddr(Query queryInfo) throws Exception {
-        QueryResponse response = new QueryResponse();
+    public ResponseEntity<QueryAddressResponse> queryAddr(QueryAddress queryAddressInfo) throws Exception {
+        QueryAddressResponse response = new QueryAddressResponse();
 
         // step1. revert AID
-        String queryAddress = queryInfo.getQueryAddress().replace(":","");
+        String queryAddress = queryAddressInfo.getQueryAddress().replace(":","");
         int timeDifference = 0;
         try{
             timeDifference = userMapper.queryAIDTruncTime(queryAddress);
@@ -290,11 +304,12 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     public ResponseEntity<Response> updateISP(ISP isp) throws Exception{
         Response response = new Response();
         String ispStr = isp.getIsp();
-        if(ispStr.contains("::/")){
-            
-        } else {
-
+        if(ispStr.contains("::/")) {
+            ispStr = ispStr.substring(0, ispStr.indexOf("::/"));
         }
+        int length = AddressUtils.getAddressBitLength(ispStr);
+        ispPrefix.setIsp(isp.getIsp());
+        ispPrefix.setLength(length);
         response.setCode(0);
         response.setMsg("success");
         return new ResponseEntity<>(response, HttpStatus.OK);

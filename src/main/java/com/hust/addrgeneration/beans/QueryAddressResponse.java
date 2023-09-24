@@ -2,13 +2,13 @@ package com.hust.addrgeneration.beans;
 
 import com.alibaba.fastjson.JSONObject;
 
-public class QueryResponse {
+public class QueryAddressResponse {
     private int code;
     private String msg;
     private JSONObject info;
-    public QueryResponse(){};
+    public QueryAddressResponse(){};
 
-    public QueryResponse(int code, String msg, JSONObject info) {
+    public QueryAddressResponse(int code, String msg, JSONObject info) {
         this.code = code;
         this.msg = msg;
         this.info = info;

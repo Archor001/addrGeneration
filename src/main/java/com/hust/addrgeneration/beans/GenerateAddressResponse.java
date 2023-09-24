@@ -1,12 +1,16 @@
 package com.hust.addrgeneration.beans;
 
-public class AddressResponse {
+import com.hust.addrgeneration.utils.ErrorUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
+public class GenerateAddressResponse {
     private int code;
     private String msg;
     private String address;
-    public AddressResponse(){};
+    public GenerateAddressResponse(){};
 
-    public AddressResponse(int code, String msg, String address) {
+    public GenerateAddressResponse(int code, String msg, String address) {
         this.code = code;
         this.msg = msg;
         this.address = address;
@@ -30,5 +34,10 @@ public class AddressResponse {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+    public ResponseEntity<GenerateAddressResponse> responseError(int code){
+        this.setCode(code);
+        this.setMsg(ErrorUtils.message(code));
+        return new ResponseEntity<>(this, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

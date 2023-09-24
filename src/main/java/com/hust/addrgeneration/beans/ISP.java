@@ -3,6 +3,7 @@ package com.hust.addrgeneration.beans;
 public class ISP {
     private String isp;
     private int length;
+    public ISP(){};
 
     public ISP(String isp, int length) {
         this.isp = isp;

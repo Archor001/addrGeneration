@@ -1,13 +1,11 @@
 package com.hust.addrgeneration.controller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.hust.addrgeneration.beans.*;
 import com.hust.addrgeneration.service.IPv6AddrService;
 import com.hust.addrgeneration.service.IPv6Service;
 import com.hust.addrgeneration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,16 +55,16 @@ public class AddrGeneration {
 
     // 地址生成
     @PostMapping(value = "/admin/address")
-    public ResponseEntity<AddressResponse> createAddress(@RequestBody Address addressInfo) throws Exception {
+    public ResponseEntity<GenerateAddressResponse> createAddress(@RequestBody GenerateAddress addressInfo) throws Exception {
         return iPv6AddrService.createAddr(addressInfo);
     }
 
     // 地址查询
     @GetMapping(value = "/admin/address")
-    public ResponseEntity<QueryResponse> queryAddr(@RequestParam("queryAddress") String queryAddress) throws Exception {
-        Query queryInfo = new Query();
-        queryInfo.setQueryAddress(queryAddress);
-        return iPv6AddrService.queryAddr(queryInfo);
+    public ResponseEntity<QueryAddressResponse> queryAddr(@RequestParam("queryAddress") String queryAddress) throws Exception {
+        QueryAddress queryAddressInfo = new QueryAddress();
+        queryAddressInfo.setQueryAddress(queryAddress);
+        return iPv6AddrService.queryAddr(queryAddressInfo);
     }
 
     // 修改ISP地址前缀
