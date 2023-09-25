@@ -7,18 +7,15 @@ import com.hust.addrgeneration.beans.QueryInfo;
 import com.hust.addrgeneration.beans.RegisterInfo;
 import com.hust.addrgeneration.service.IPv6AddrService;
 import com.hust.addrgeneration.service.IPv6Service;
+import org.apache.ibatis.annotations.Delete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
-@Controller
-@CrossOrigin
+@RestController
 public class AddrGeneration {
     private final IPv6Service ipv6Service;
     private final IPv6AddrService iPv6AddrService;
@@ -29,8 +26,8 @@ public class AddrGeneration {
         this.iPv6AddrService = iPv6AddrService;
     }
 
-    @RequestMapping(value = "/register")
-    @ResponseBody
+    // 创建用户
+    @PutMapping(value = "/user")
     public RegisterInfo register(@RequestBody InfoBean userInfo) throws Exception {
         RegisterInfo backHtml = new RegisterInfo();
         try {
@@ -50,8 +47,8 @@ public class AddrGeneration {
         }
     }
 
-    @RequestMapping(value = "/delete")
-    @ResponseBody
+    // 删除用户
+    @DeleteMapping(value = "/user")
     public NormalMsg deleteUser(@RequestBody InfoBean userInfo) throws Exception {
         NormalMsg backHtml = new NormalMsg();
         try {
@@ -70,12 +67,18 @@ public class AddrGeneration {
         }
     }
 
-    @RequestMapping(value = "/creatPortWithRealIPv6Addr")
-    @ResponseBody
+    // 修改用户
+    @PostMapping(value = "/user")
+    public NormalMsg updateUser(@RequestBody InfoBean userInfo) throws Exception {
+        return null;
+    }
+
+    // 地址生成
+    @PostMapping(value = "/address")
     public NormalMsg creatPort(@RequestBody InfoBean userInfo) throws Exception {
         NormalMsg backHtml = new NormalMsg();
         try {
-            String addr = iPv6AddrService.creatPortWithIPv6Addr(userInfo);
+            String addr = iPv6AddrService.generateAddr(userInfo);
             backHtml.setStatus(1);
             backHtml.setMessage(addr);
             return backHtml;
@@ -90,34 +93,8 @@ public class AddrGeneration {
         }
     }
 
-    @RequestMapping(value = "/getIPv6Addr")
-    @ResponseBody
-    public NormalMsg generateAddr(@RequestBody InfoBean userInfo) throws Exception {
-        NormalMsg backHtml = new NormalMsg();
-        try {
-            String addr = iPv6AddrService.getAddr(userInfo);
-            backHtml.setStatus(1);
-            backHtml.setMessage(addr);
-            return backHtml;
-        } catch (Exception e) {
-            backHtml.setStatus(0);
-            if (e.getMessage() == null)
-                backHtml.setMessage("用户尚未注册！请先注册");
-            else
-                backHtml.setMessage(e.getMessage());
-            return backHtml;
-        }
-    }
-
-    @RequestMapping(value = "/getSubnet")
-    @ResponseBody
-    public NormalMsg generateSubnet(@RequestBody InfoBean userInfo) throws Exception {
-        NormalMsg backHtml = new NormalMsg();
-        return backHtml;
-    }
-
-    @RequestMapping(value = "/query")
-    @ResponseBody
+    // 地址查询（溯源）
+    @GetMapping(value = "/address")
     public NormalMsg queryAddr(@RequestBody InfoBean userInfo) throws Exception {
         QueryInfo backHtml = new QueryInfo();
         try {
@@ -138,4 +115,6 @@ public class AddrGeneration {
             return backHtml;
         }
     }
+
+    // 地址删除
 }

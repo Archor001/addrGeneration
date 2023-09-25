@@ -89,7 +89,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     }
 
     @Override
-    public String getAddr(InfoBean infoBean) throws Exception {
+    public String generateAddr(InfoBean infoBean) throws Exception {
         String NID = infoBean.getNid();
         String password = infoBean.getPassword();
         // step1. check NID and password
@@ -145,57 +145,6 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         }
         String asPrefix = "2001:250:4000:4507:";
         return asPrefix + suffix.substring(0,suffix.length()-1);
-    }
-
-    @Override
-    public String getSubnet(InfoBean infoBean) throws Exception {
-        return null;
-    }
-
-    @Override
-    public String creatPortWithIPv6Addr(InfoBean userInfo) throws Exception {
-        JSONObject request = new JSONObject();
-        String jsonString = "{\n" +
-                "\t\"port\": {\n" +
-                "\t\t\"admin_state_up\": true,\n" +
-                "\t\t\"name\": \"true-port-" + portCount +"\",\n" +
-                "\t\t\"tenant_id\": \"1c211c79a8c5437aa478479d1476bfac\",\n" +
-                "\t\t\"network_id\": \"6b9fcbdd-e544-4095-9ac9-efe0f7bab51e\",\n" +
-                "\t\t\"port_security_enabled\": true,\n" +
-                "\t\t\"propagate_uplink_status\": false,\n" +
-                "\t\t\"fixed_ips\" : [\n" +
-                "\t\t    {\n" +
-                "\t\t        \"nid\":\"" + userInfo.getNid() + "\",\n" +
-                "\t\t        \"passwd\":\"" + userInfo.getPassword() + "\",\n" +
-                "\t\t        \"subnet_id\" : \"255b0255-ba6a-4820-bf1c-0f5309b9c676\"\n" +
-                "\t\t    }\n" +
-                "\t\t]\n" +
-                "\t}\n" +
-                "}";
-        request = JSONObject.parseObject(jsonString);
-        JSONObject reply = getNormalResponse("http://192.168.248.143:9696/v2.0/ports", request);
-        portCount++;
-        return reply.getJSONObject("port").getJSONArray("fixed_ips").getJSONObject(0).getString("ip_address");
-    }
-
-    public static JSONObject getNormalResponse(String url, JSONObject json) throws Exception {
-        return SendPostPacket(url, json);
-    }
-
-    private static JSONObject SendPostPacket(String url, JSONObject json) throws Exception {
-        RestTemplate client = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        HttpMethod method = HttpMethod.POST;
-        MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
-
-
-        headers.add("Accept", MediaType.APPLICATION_JSON.toString());
-        headers.add("X-Auth-Token", "gAAAAABkj-zN619wuAG7vNbKubKOoceAhwRYX4ppd2PltQTYrTfhSXpZTwwS3Z-F40K_xRXEBkoHISBrQSNIGsHCGiC9TJazpJ7qSW0eciEhAWHcBeEdWF0Gn5m9nQd2ddwWtL9r8dqpYVedjsI8SgCuNc_n6p56l8FZ9LNfWdFEeYn6_XKNfmw");
-
-        HttpEntity<String> requestEntity = new HttpEntity<String>(json.toString(), headers);
-
-        String res = client.exchange(url, method, requestEntity, String.class).getBody();
-        return JSONObject.parseObject(res);
     }
 
     @Override
