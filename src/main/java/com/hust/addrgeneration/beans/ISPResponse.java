@@ -8,7 +8,8 @@ public class ISPResponse extends Response{
     private String isp;
     private int length;
     public ISPResponse(){};
-    public ISPResponse(String isp, int length){
+    public ISPResponse(int code, String msg, String isp, int length){
+        super(code, msg);
         this.isp = isp;
         this.length = length;
     }

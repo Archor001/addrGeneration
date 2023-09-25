@@ -6,38 +6,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserResponse {
-
-    private int code;
-    private String msg;
+public class UserResponse extends Response{
     private User user;
     public UserResponse(){};
 
     public UserResponse(int code, String msg, User user) {
-        this.code = code;
-        this.msg = msg;
+        super(code, msg);
         this.user = user;
     }
 
     public User getUser() { return user; }
-
     public void setUser(User user) { this.user = user; }
 
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
     public ResponseEntity<UserResponse> responseError(int code){
         this.setCode(code);
         this.setMsg(ErrorUtils.message(code));

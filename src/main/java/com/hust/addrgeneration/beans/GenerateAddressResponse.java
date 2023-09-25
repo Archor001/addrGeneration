@@ -4,16 +4,12 @@ import com.hust.addrgeneration.utils.ErrorUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public class GenerateAddressResponse {
-    private int code;
-    private String msg;
+public class GenerateAddressResponse extends Response{
     private User user;
     private String address;
     public GenerateAddressResponse(){};
-
     public GenerateAddressResponse(int code, String msg, User user, String address) {
-        this.code = code;
-        this.msg = msg;
+        super(code, msg);
         this.user = user;
         this.address = address;
     }
@@ -24,21 +20,6 @@ public class GenerateAddressResponse {
     public User getUser() { return user;}
     public void setUser(User user) {this.user=user;}
 
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
     public ResponseEntity<GenerateAddressResponse> responseError(int code){
         this.setCode(code);
         this.setMsg(ErrorUtils.message(code));
