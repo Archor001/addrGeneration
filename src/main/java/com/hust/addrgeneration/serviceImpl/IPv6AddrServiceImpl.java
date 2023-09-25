@@ -293,14 +293,11 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         } else {
             length = AddressUtils.getAddressBitLength(ispStr);
         }
-        // 如果之前存在ISP，说明是修改操作，需要重新生成地址
-        if(ispPrefix.getIsp() != null){
+        // 如果ISP发生了变化，重新生成地址
+        if(ispPrefix.getIsp() != ispStr || ispPrefix.getLength() != length){
             ispPrefix.setIsp(ispStr);
             ispPrefix.setLength(length);
             this.regenAddress();
-        } else {
-            ispPrefix.setIsp(ispStr);
-            ispPrefix.setLength(length);
         }
         response.setCode(0);
         response.setMsg("success");
