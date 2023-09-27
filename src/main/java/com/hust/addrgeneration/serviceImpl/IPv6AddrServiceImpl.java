@@ -200,9 +200,16 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         } catch (Exception e){
             return response.responseError(10003);
         }
+
+        User respUser = user;
+        respUser.setNid(nid);
+        respUser.setAddress(generateAddr);
+        respUser.setPrefix(prefix);
+        respUser.setRegisterTime(currentTime);
+
         response.setCode(0);
         response.setMsg("success");
-        response.setUser(user);
+        response.setUser(respUser);
         response.setAddress(generateAddr);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
