@@ -29,7 +29,7 @@ public class AddrGeneration {
     }
 
     // 用户注册(申请NID)
-    @PutMapping(value = "/admin/register")
+    @PutMapping(value = "/admin/user")
     public ResponseEntity<GenerateAddressResponse> register(@RequestBody User userInfo) throws Exception {
         return iPv6AddrService.registerNID(userInfo);
     }
