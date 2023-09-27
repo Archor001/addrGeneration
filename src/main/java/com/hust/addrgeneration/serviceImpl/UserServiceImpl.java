@@ -92,16 +92,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<UserResponse> DeleteUser(String nid){
-        UserResponse response = new UserResponse();
+    public ResponseEntity<Response> DeleteUser(String nid){
+        Response response = new Response();
         User user = userMapper.queryRegisterInfo(nid);
         if(user == null){
-            return response.responseError(10014);
+            return response.responseNormalError(10014);
         }
         try{
             userMapper.deleteUser(nid);
         } catch(Exception e) {
-            return response.responseError(10013);
+            return response.responseNormalError(10013);
         }
         response.setCode(0);
         response.setMsg("success");

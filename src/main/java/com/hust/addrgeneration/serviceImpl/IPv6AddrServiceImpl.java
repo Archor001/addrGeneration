@@ -96,6 +96,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         } catch (Exception e){
             return response.responseError(10003);
         }
+
     }
 
     // 地址生成
@@ -201,15 +202,14 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             return response.responseError(10003);
         }
 
-        User respUser = user;
-        respUser.setNid(nid);
-        respUser.setAddress(generateAddr);
-        respUser.setPrefix(prefix);
-        respUser.setRegisterTime(currentTime);
+        user.setNid(nid);
+        user.setAddress(generateAddr);
+        user.setPrefix(prefix + "::/" + ispPrefix.getLength());
+        user.setRegisterTime(currentTime);
 
         response.setCode(0);
         response.setMsg("success");
-        response.setUser(respUser);
+        response.setUser(user);
         response.setAddress(generateAddr);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

@@ -49,7 +49,7 @@ public class AddrGeneration {
 
     // 删除用户
     @DeleteMapping(value="/admin/user")
-    public ResponseEntity<UserResponse> deleteUser(@RequestParam("nid") String nid) throws Exception{
+    public ResponseEntity<Response> deleteUser(@RequestParam("nid") String nid) throws Exception{
         return userService.DeleteUser(nid);
     }
 
