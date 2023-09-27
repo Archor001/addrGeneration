@@ -202,6 +202,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         }
         response.setCode(0);
         response.setMsg("success");
+        response.setUser(user);
         response.setAddress(generateAddr);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
