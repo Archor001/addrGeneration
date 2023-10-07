@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 public interface IPv6AddrService {
     ResponseEntity<RegisterResponse> createUser(InfoBean infoBean) throws Exception;
-    String getNID(InfoBean infoBean) throws Exception;
     ResponseEntity<Response> deleteUser(InfoBean infoBean) throws Exception;
     ResponseEntity<Response> updateUser(InfoBean infoBean) throws Exception;
     ResponseEntity<GenerateAddressResponse> generateAddr(InfoBean infoBean) throws Exception;
