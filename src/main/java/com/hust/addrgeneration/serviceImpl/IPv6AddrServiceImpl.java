@@ -34,27 +34,28 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     }
 
     @Override
-    public String getNID(InfoBean infoBean) throws Exception {
-        String userID = infoBean.getUserID();
+    public ResponseEntity<RegisterResponse> createUser(InfoBean infoBean) throws Exception {
+        RegisterResponse response = new RegisterResponse();
+        String name = infoBean.getName();
         String password = infoBean.getPassword();
         String phoneNumber = infoBean.getPhoneNumber();
-        String userName = infoBean.getName();
+        String username = infoBean.getUsername();
+        String emailAddress = infoBean.getEmailAddress();
+        int role = infoBean.getRole();
 
-        // step1. Calculate NID with user's information
-        String encryptStr = userID + phoneNumber + userName;
+        // Step1. 生成NID
+        String encryptStr = name + phoneNumber + username;
         String hashStr = HashUtils.SM3Hash(encryptStr);
         String userPart = ConvertUtils.hexStringToBinString(hashStr).substring(0,38);
-        String userType = userID.substring(0,1);
+        String userType = username.substring(0,1);
         String organizationPart = "";
         switch (userType) {
             case "U" :
                 organizationPart = "00";
                 break;
-
             case "M" :
                 organizationPart = "01";
                 break;
-
             case "D" :
                 organizationPart = "10";
                 break;
@@ -62,22 +63,17 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
                 organizationPart = "11";
                 break;
         }
-    
         String NID = ConvertUtils.binStringToHexString(userPart + organizationPart);
-        QueryInfo info = userMapper.queryAddrInfo(NID);
-        if(info != null){
-            throw new Exception("此用户已经注册NID");
+
+        // Step2. 写入数据库
+        try {
+            userMapper.register(NID, password, username, phoneNumber, name, emailAddress, role);
+        } catch (Exception e) {
+            return response.responseError(10003);
         }
-        userMapper.register(NID,password,userID,phoneNumber, userName);
-
-        return NID;
-
-    }
-
-    @Override
-    public ResponseEntity<RegisterResponse> createUser(InfoBean infoBean) throws Exception {
-        RegisterResponse response = new RegisterResponse();
-        // TODO
+        response.setNid(NID);
+        response.setCode(0);
+        response.setMsg("success");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

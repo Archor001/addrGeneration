@@ -4,41 +4,20 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class InfoBean {
-    private String userID;
+    private String username;
     private String password;
     private String phoneNumber;
     private String name;
     private String nid;
-    private String queryAddress;
-    private String userContent;
-    public String getQueryAddress() {
-        return queryAddress;
-    }
+    private String emailAddress;
+    private int role;
 
-    public void setQueryAddress(String queryAddress) {
-        this.queryAddress = queryAddress;
-    }
-
-    public String getNid() {
-        return nid;
-    }
-
-    public void setNid(String nid) {
-        this.nid = nid;
-    }
-
-    public String getUserID() {
-        return userID;
-    }
-
-    public void setUserID(String userID) {
-        this.userID = userID;
-    }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
 
     public String getPassword() {
         return password;
     }
-
     public void setPassword(String password) {
         this.password = password;
     }
@@ -46,7 +25,6 @@ public class InfoBean {
     public String getPhoneNumber() {
         return phoneNumber;
     }
-
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
@@ -54,12 +32,26 @@ public class InfoBean {
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
-    public String getUserContent() {
-        return userContent;
+
+    public String getNid() {
+        return nid;
     }
-    public void setUserContent(String userContent) {this.userContent = userContent;}
+    public void setNid(String nid) {
+        this.nid = nid;
+    }
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
+    public int getRole() {
+        return role;
+    }
+    public void setRole(int role) {this.role = role;}
 }

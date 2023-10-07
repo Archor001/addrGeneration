@@ -12,6 +12,8 @@ public class ErrorUtils {
                 return "Need Login";
             case 10002:
                 return "Wrong Password";
+            case 10003:
+                return "Failed to create user";
             default:
                 return "Unknown";
         }
