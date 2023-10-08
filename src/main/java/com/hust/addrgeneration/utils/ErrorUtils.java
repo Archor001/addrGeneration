@@ -9,13 +9,35 @@ public class ErrorUtils {
     public static String message(int code) {
         switch (code) {
             case 10001:
-                return "Need Login";
+                return "需要登录";
             case 10002:
-                return "Wrong Password";
+                return "密码错误";
             case 10003:
-                return "Failed to create user";
+                return "创建用户失败";
+            case 10004:
+                return "删除用户失败";
+            case 10005:
+                return "无效手机号码";
+            case 10006:
+                return "无效角色";
+            case 10007:
+                return "无效邮箱";
+            case 10008:
+                return "修改用户失败";
+            case 10009:
+                return "NID不存在";
+            case 10010:
+                return "请勿频繁生成地址";
+            case 10011:
+                return "地址生成失败";
+            case 10012:
+                return "地址溯源失败";
+            case 10013:
+                return "获取密钥出错！密钥集为空";
+            case 10014:
+                return "解密出错";
             default:
-                return "Unknown";
+                return "未知错误";
         }
     }
 }

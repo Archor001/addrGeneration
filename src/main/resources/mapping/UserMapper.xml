@@ -2,20 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.hust.addrgeneration.dao.UserMapper">
     <insert id="register" parameterType="String">
-        insert into register (NID, userID, phoneNumber, password, userName)
-        values (#{NID}, #{userID}, #{phoneNumber}, #{password}, #{userName})
+        insert into register (nid, username, phoneNumber, password, name, emailAddress, role)
+        values (#{nid}, #{username}, #{phoneNumber}, #{password}, #{name}, #{emailAddress}, #{role})
     </insert>
 
-    <delete id="delete" parameterType="String">
-        delete from register where NID = #{userContent} or userID = #{userContent}
+    <delete id="deleteUser" parameterType="String">
+        delete from register where nid = #{userContent} or userID = #{userContent}
     </delete>
 
-    <select id="getKey" parameterType="String" resultType="String">
-        select password from register where NID = #{NID}
+    <update id="updateUser" parameterType="com.hust.addrgeneration.beans.InfoBean">
+        update register set nid = #{nid}, name = #{name}, password = #{password}, phoneNumber = #{phoneNumber}, role = #{role}, emailAddress = #{emailAddress} where username = #{username}
+    </update>
+
+    <select id="getUser" parameterType="String" resultType="com.hust.addrgeneration.beans.InfoBean">
+        select * from register where nid = #{nid}
     </select>
 
-    <select id="queryAddrInfo" parameterType="String" resultType="com.hust.addrgeneration.beans.QueryInfo">
-        select userID, phoneNumber, userName from register where NID = #{NID}
+    <select id="getPasswordFromNID" parameterType="String" resultType="String">
+        select password from register where nid = #{nid}
     </select>
 
     <insert id="updateKey" parameterType="com.hust.addrgeneration.beans.KeyInfo">
@@ -32,7 +36,7 @@
         values (#{aid}, #{prefix})
     </insert>
 
-    <select id="getPrefix" parameterType="String" resultType="String">
+    <select id="getAIDPrefix" parameterType="String" resultType="String">
         select prefix from aidinfo where aid = #{AID}
     </select>
 

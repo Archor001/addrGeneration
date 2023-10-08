@@ -6,14 +6,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class QueryAddressResponse extends Response{
-    private JSONObject info;
+    private String address;
     public QueryAddressResponse(){};
-    public QueryAddressResponse(int code, String msg, JSONObject info) {
+    public QueryAddressResponse(int code, String msg, String address) {
         super(code, msg);
-        this.info = info;
+        this.address = address;
     }
-    public void setInfo(JSONObject info) {this.info=info;}
-    public JSONObject getInfo() {return info;}
+    public void setAddress(String address) {this.address=address;}
+    public String getAddress() {return address;}
     public ResponseEntity<QueryAddressResponse> responseError(int code){
         this.setCode(code);
         this.setMsg(ErrorUtils.message(code));
