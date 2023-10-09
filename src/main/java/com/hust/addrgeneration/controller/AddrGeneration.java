@@ -33,8 +33,9 @@ public class AddrGeneration {
 
     // 地址生成
     @PostMapping(value = "/address")
-    public ResponseEntity<GenerateAddressResponse> generateAddress(@RequestBody GenerateAddress generateAddress) throws Exception { return iPv6AddrService.generateAddr(generateAddress);}
+    public ResponseEntity<GenerateAddressResponse> generateAddress(@RequestBody GenerateAddress generateAddress) throws Exception { return iPv6AddrService.generateAddress(generateAddress);}
 
+    // 地址查询
     @GetMapping(value = "/query")
     public ResponseEntity<QueryAddressResponse> queryAddress(@RequestParam("nid") String nid) throws Exception {return iPv6AddrService.queryAddress(nid);}
 

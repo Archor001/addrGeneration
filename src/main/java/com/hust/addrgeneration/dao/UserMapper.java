@@ -22,10 +22,9 @@ public interface UserMapper {
     String getIdeaKey(String addrGenIP, String timeHash);
 
     // aidinfo表
-    int updateAID(String aid, String prefix);
-    String getAIDPrefix(String AID);
-
-    // timehash表
-    int updateTimeHash(String AID, String AIDnTH);
-    String getAIDnTH(String AID);
+    void updateAID(String aidnth, String prefix, String aid, String nid);
+    String getAIDnTHPrefix(String aidnth);
+    String getAIDnTH(String aid);
+    String getAID(String nid);
+    void deleteAID(String aid);
 }

@@ -36,6 +36,10 @@ public class ErrorUtils {
                 return "获取密钥出错！密钥集为空";
             case 10014:
                 return "解密出错";
+            case 10015:
+                return "地址查询失败";
+            case 10016:
+                return "地址删除失败";
             default:
                 return "未知错误";
         }

@@ -146,7 +146,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     // 地址生成
     @Override
-    public ResponseEntity<GenerateAddressResponse> generateAddr(GenerateAddress generateAddress) throws Exception {
+    public ResponseEntity<GenerateAddressResponse> generateAddress(GenerateAddress generateAddress) throws Exception {
         GenerateAddressResponse response = new GenerateAddressResponse();
 
         String nid = generateAddress.getNid();
@@ -184,14 +184,9 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         BigInteger big2 = new BigInteger(str2, 16);
         String AIDnTH = big1.xor(big2).toString(16);
 
-        String prefix = userMapper.getAIDPrefix(AIDnTH);
+        String prefix = userMapper.getAIDnTHPrefix(AIDnTH);
         if(prefix != null){
             return response.responseError(10010);
-        }
-        try {
-            userMapper.updateAID(AIDnTH, big1.toString(16));
-        } catch (Exception e){
-            return response.responseError(10011);
         }
 
         // step4. Generate AID-withTimeHash(aka AID) with AIDnTH and time-Hash
@@ -204,7 +199,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         BigInteger big4 = new BigInteger(timeHash, 16);
         String AID = String.format("%016x", big3.xor(big4));
         try{
-            userMapper.updateTimeHash(AID, AIDnTH);
+            userMapper.updateAID(AIDnTH, big1.toString(16), AID, nid);
         } catch (Exception e){
             return response.responseError(10011);
         }
@@ -221,12 +216,27 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    // 地址查询
     @Override
     public ResponseEntity<QueryAddressResponse> queryAddress(String nid) throws Exception {
         QueryAddressResponse response = new QueryAddressResponse();
 
+        String AID = "";
+        try{
+            AID = userMapper.getAID(nid);
+        } catch (Exception e){
+            return response.responseError(10015);
+        }
+
+        StringBuilder suffix = new StringBuilder();
+        for (int i = 0; i < AID.length(); i+=4) {
+            suffix.append(AID, i, i + 4).append(":");
+        }
+        String address = "2001:250:4000:4507:" + suffix.substring(0,suffix.length()-1);
+
         response.setCode(0);
         response.setMsg("success");
+        response.setAddress(address);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -258,7 +268,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         // step2. use suffix of IPv6-address to get the whole encrypt data(128-bits)
         String prefix = "";
         try{
-            prefix = userMapper.getAIDPrefix(AIDnTH);
+            prefix = userMapper.getAIDnTHPrefix(AIDnTH);
         } catch (Exception e){
             return response.responseError(10012);
         }
@@ -299,6 +309,16 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     @Override
     public ResponseEntity<Response> deleteAddress(String address) throws Exception {
         Response response = new Response();
+
+        int pos = getIndexOf(address, ":", 4);
+        String aidStr = address.substring(pos+1);
+        String AID = aidStr.replace(":","");
+
+        try{
+            userMapper.deleteAID(AID);
+        } catch (Exception e){
+            return response.responseNormalError(10016);
+        }
 
         response.setCode(0);
         response.setMsg("success");
