@@ -3,7 +3,7 @@ package com.hust.addrgeneration.beans;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InfoBean {
+public class User {
     private String username;
     private String password;
     private String phoneNumber;
@@ -11,6 +11,7 @@ public class InfoBean {
     private String nid;
     private String emailAddress;
     private int role;
+    private String address;
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
@@ -54,4 +55,6 @@ public class InfoBean {
         return role;
     }
     public void setRole(int role) {this.role = role;}
+    public String getAddress() {return address;}
+    public void setAddress(String address) {this.address = address;}
 }

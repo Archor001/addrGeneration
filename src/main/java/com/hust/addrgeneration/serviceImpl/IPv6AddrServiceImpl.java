@@ -28,122 +28,6 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         this.userMapper = userMapper;
     }
 
-    // 创建用户
-    @Override
-    public ResponseEntity<UserResponse> createUser(InfoBean infoBean) throws Exception {
-        UserResponse response = new UserResponse();
-        String name = infoBean.getName();
-        String password = infoBean.getPassword();
-        String phoneNumber = infoBean.getPhoneNumber();
-        String username = infoBean.getUsername();
-        String emailAddress = infoBean.getEmailAddress();
-        int role = infoBean.getRole();
-
-        // Step1. 检查参数合法性
-        String phoneRegexp = "^((13[0-9])|(14[57])|(15[0-35-9])|(16[2567])|(17[0-8])|(18[0-9])|(19[0-9]))\\d{8}$";
-        if(!Pattern.matches(phoneRegexp,phoneNumber)){
-            return response.responseError(10005);
-        }
-        if( role<0 || role>4 ){
-            return response.responseError(10006);
-        }
-        String emailRegexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
-        if(!Pattern.matches(emailRegexp,emailAddress)){
-            return response.responseError(10007);
-        }
-
-        // Step2. 生成NID
-        String nid = generateNID(username, phoneNumber, name);
-
-        // Step3. 写入数据库
-        try {
-            userMapper.register(nid, password, username, phoneNumber, name, emailAddress, role);
-        } catch (Exception e) {
-            return response.responseError(10003);
-        }
-        response.setNid(nid);
-        response.setCode(0);
-        response.setMsg("success");
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    // 删除用户
-    @Override
-    public ResponseEntity<Response> deleteUser(String userContent) throws  Exception {
-        Response response = new Response();
-        if(userContent.contains(",")){  // 批量
-            String[] users = userContent.split(",");
-            for(String user : users){
-                try {
-                    userMapper.deleteUser(user);
-                } catch (Exception e){
-                    return response.responseNormalError(10004);
-                }
-            }
-        } else {
-            try {
-                userMapper.deleteUser(userContent);
-            } catch (Exception e){
-                return response.responseNormalError(10004);
-            }
-        }
-        response.setMsg("success");
-        response.setCode(0);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    // 修改用户
-    @Override
-    public ResponseEntity<UserResponse> updateUser(InfoBean infoBean) throws  Exception {
-        UserResponse response = new UserResponse();
-
-        // Step1. 检查nid是否存在
-        String nid = infoBean.getNid();
-        if(nid == null || nid.length() <= 0){
-            return response.responseError(10009);
-        }
-        InfoBean user = new InfoBean();
-        try{
-            user = userMapper.getUser(nid);
-        } catch (Exception e){
-            return response.responseError(10008);
-        }
-
-        // Step2. 检查参数合法性
-        String username = user.getUsername();
-        String name = infoBean.getName();
-        String phoneNumber = infoBean.getPhoneNumber();
-        String emailAddress = infoBean.getEmailAddress();
-        int role = infoBean.getRole();
-
-        String phoneRegexp = "^((13[0-9])|(14[57])|(15[0-35-9])|(16[2567])|(17[0-8])|(18[0-9])|(19[0-9]))\\d{8}$";
-        if(!Pattern.matches(phoneRegexp,phoneNumber)){
-            return response.responseError(10005);
-        }
-        if( role<0 || role>4 ){
-            return response.responseError(10006);
-        }
-        String emailRegexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
-        if(!Pattern.matches(emailRegexp,emailAddress)){
-            return response.responseError(10007);
-        }
-
-        // Step3. 重新生成NID
-        String newNID = generateNID(username,phoneNumber,name);
-        infoBean.setUsername(username);
-        infoBean.setNid(newNID);
-
-        // Step4. 数据库更新
-        try{
-            userMapper.updateUser(infoBean);
-        } catch (Exception e){
-            return response.responseError(10008);
-        }
-        response.setCode(0);
-        response.setMsg("success");
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
     // 地址生成
     @Override
     public ResponseEntity<GenerateAddressResponse> generateAddress(GenerateAddress generateAddress) throws Exception {
@@ -293,7 +177,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         Instant instant = Instant.ofEpochSecond(registerTime);
         LocalDateTime registerTimeStr = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 
-        InfoBean user = userMapper.getUser(nid);
+        User user = userMapper.getUser(nid);
         if(user == null){
             return response.responseError(10012);
         }
@@ -335,28 +219,5 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
                 break;
         }
         return matcher.start();
-    }
-
-    private String generateNID(String username, String phoneNumber, String name){
-        String encryptStr = username + phoneNumber + name;
-        String hashStr = HashUtils.SM3Hash(encryptStr);
-        String userPart = ConvertUtils.hexStringToBinString(hashStr).substring(0,38);
-        String userType = username.substring(0,1);
-        String organizationPart = "";
-        switch (userType) {
-            case "U" :
-                organizationPart = "00";
-                break;
-            case "M" :
-                organizationPart = "01";
-                break;
-            case "D" :
-                organizationPart = "10";
-                break;
-            default:
-                organizationPart = "11";
-                break;
-        }
-        return ConvertUtils.binStringToHexString(userPart + organizationPart);
     }
 }

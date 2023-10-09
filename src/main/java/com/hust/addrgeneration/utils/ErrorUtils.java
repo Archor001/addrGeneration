@@ -40,6 +40,8 @@ public class ErrorUtils {
                 return "地址查询失败";
             case 10016:
                 return "地址删除失败";
+            case 10017:
+                return "批量获取用户失败";
             default:
                 return "未知错误";
         }

@@ -6,17 +6,17 @@ import org.springframework.http.ResponseEntity;
 
 public class TraceAddressResponse extends Response {
     private String registerTime;
-    private InfoBean infoBean;
+    private User infoBean;
     public TraceAddressResponse(){};
-    public TraceAddressResponse(int code, String msg, int status, String registerTime, InfoBean infoBean) {
+    public TraceAddressResponse(int code, String msg, int status, String registerTime, User infoBean) {
         super(code, msg);
         this.registerTime = registerTime;
         this.infoBean = infoBean;
     }
     public String getRegisterTime() {return registerTime;}
     public void setRegisterTime(String registerTime) {this.registerTime = registerTime;}
-    public InfoBean getInfoBean() {return infoBean;}
-    public void setInfoBean(InfoBean infoBean) {this.infoBean = infoBean;}
+    public User getInfoBean() {return infoBean;}
+    public void setInfoBean(User infoBean) {this.infoBean = infoBean;}
     public ResponseEntity<TraceAddressResponse> responseError(int code){
         this.setCode(code);
         this.setMsg(ErrorUtils.message(code));

@@ -1,7 +1,7 @@
 #server configuration
 server:
   servlet:
-    context-path: /addressGeneration
+    context-path: /api
   port: 2233
 
 #database configuration
@@ -16,3 +16,7 @@ spring:
 mybatis:
   mapper-locations: classpath:mapping/*Mapper.xml
   type-aliases-package: com.hust.addrgeneration.beans
+
+custom:
+  admin: root
+  password: root@v6

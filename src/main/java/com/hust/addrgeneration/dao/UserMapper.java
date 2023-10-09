@@ -1,9 +1,7 @@
 package com.hust.addrgeneration.dao;
 
-import com.hust.addrgeneration.beans.InfoBean;
+import com.hust.addrgeneration.beans.User;
 import com.hust.addrgeneration.beans.KeyInfo;
-import com.hust.addrgeneration.beans.QueryInfo;
-import com.hust.addrgeneration.beans.QueryKeyInfo;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,8 +11,8 @@ public interface UserMapper {
     // register表
     void register(String nid, String password, String username, String phoneNumber, String name, String emailAddress, int role);
     void deleteUser(String userContent);
-    void updateUser(InfoBean infoBean);
-    InfoBean getUser(String nid);
+    void updateUser(User infoBean);
+    User getUser(String nid);
     String getPasswordFromNID(String nid);
 
     // keyinfo表
@@ -27,4 +25,8 @@ public interface UserMapper {
     String getAIDnTH(String aid);
     String getAID(String nid);
     void deleteAID(String aid);
+
+    // 联合查询
+    List<User> getUsersByFilter(int offset, int limit, String content);
+    int getUserCountByFilter(String content);
 }

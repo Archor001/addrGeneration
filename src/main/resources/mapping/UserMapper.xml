@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.hust.addrgeneration.dao.UserMapper">
-    <insert id="register" parameterType="String">
+    <insert id="register">
         insert into register (nid, username, phoneNumber, password, name, emailAddress, role)
         values (#{nid}, #{username}, #{phoneNumber}, #{password}, #{name}, #{emailAddress}, #{role})
     </insert>
 
     <delete id="deleteUser" parameterType="String">
-        delete from register where nid = #{userContent} or userID = #{userContent}
+        delete from register where nid = #{userContent} or username = #{userContent}
     </delete>
 
-    <update id="updateUser" parameterType="com.hust.addrgeneration.beans.InfoBean">
+    <update id="updateUser" parameterType="com.hust.addrgeneration.beans.User">
         update register set nid = #{nid}, name = #{name}, password = #{password}, phoneNumber = #{phoneNumber}, role = #{role}, emailAddress = #{emailAddress} where username = #{username}
     </update>
 
-    <select id="getUser" parameterType="String" resultType="com.hust.addrgeneration.beans.InfoBean">
+    <select id="getUser" parameterType="String" resultType="com.hust.addrgeneration.beans.User">
         select * from register where nid = #{nid}
     </select>
 
@@ -51,5 +51,15 @@
     <delete id="deleteAID" parameterType="String">
         delete from aidinfo where aid = #{aid}
     </delete>
+
+    <select id="getUsersByFilter" resultType="com.hust.addrgeneration.beans.User">
+        select register.*, aidinfo.aid, from register left join aidinfo on register.nid = aidinfo.nid
+        where register.username LIKE CONCAT('%',#{content},'%') OR register.name LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="getUserCountByFilter" parameterType="String" resultType="int">
+        select COUNT(*) from register left join aidinfo on register.nid = aidinfo.nid
+        where register.username LIKE CONCAT('%',#{content},'%') OR register.name LIKE CONCAT('%',#{content},'%')
+    </select>
 
 </mapper>

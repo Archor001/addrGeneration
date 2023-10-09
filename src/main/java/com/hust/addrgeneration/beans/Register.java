@@ -1,15 +1,13 @@
 package com.hust.addrgeneration.beans;
 
-import com.alibaba.fastjson.JSONObject;
-
 public class Register {
-    private InfoBean info;
+    private User info;
 
-    public InfoBean getInfo() {
+    public User getInfo() {
         return info;
     }
 
-    public void setInfo(InfoBean info) {
+    public void setInfo(User info) {
         this.info = info;
     }
 }
