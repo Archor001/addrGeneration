@@ -1,7 +1,7 @@
 #server configuration
 server:
   servlet:
-    context-path: /api
+    context-path: /addrgeneration
   port: 2233
 
 #database configuration

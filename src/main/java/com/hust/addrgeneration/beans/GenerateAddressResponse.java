@@ -12,7 +12,7 @@ public class GenerateAddressResponse extends Response{
         this.address = address;
     }
 
-    public String getAdress() { return address;}
+    public String getAddress() { return address;}
     public void setAddress(String address) {this.address=address;}
 
     public ResponseEntity<GenerateAddressResponse> responseError(int code){

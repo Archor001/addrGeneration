@@ -31,10 +31,14 @@
         select ideakey from keyinfo where addrGenIP = #{addrGenIP} and timehash = #{timeHash}
     </select>
 
-    <insert id="updateAID" parameterType="String">
-        insert into aidinfo (aidnth, prefix, aid, nid)
-        values (#{aidnth}, #{prefix}, #{aid}, #{nid})
+    <insert id="updateAID">
+        insert into aidinfo (aidnth, prefix, aid, nid, registerTime, address)
+        values (#{aidnth}, #{prefix}, #{aid}, #{nid}, #{registerTime}, #{address})
     </insert>
+
+    <select id="getAddress" parameterType="String" resultType="String">
+        select address from aidinfo where nid = #{nid}
+    </select>
 
     <select id="getAIDnTHPrefix" parameterType="String" resultType="String">
         select prefix from aidinfo where aidnth = #{aidnth}
@@ -53,7 +57,7 @@
     </delete>
 
     <select id="getUsersByFilter" resultType="com.hust.addrgeneration.beans.User">
-        select register.*, aidinfo.aid, from register left join aidinfo on register.nid = aidinfo.nid
+        select register.*, aidinfo.address, aidinfo.registerTime from register left join aidinfo on register.nid = aidinfo.nid
         where register.username LIKE CONCAT('%',#{content},'%') OR register.name LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
     </select>
 

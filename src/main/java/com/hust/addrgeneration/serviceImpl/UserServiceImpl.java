@@ -58,19 +58,6 @@ public class UserServiceImpl implements UserService {
             return response.responseError(10017);
         }
         User[] users = userList.toArray(new User[userList.size()]);
-        for(User i : users){
-            String address = i.getAddress();
-            if(address == null || address.isEmpty())
-                continue;
-            StringBuilder sb = new StringBuilder();
-            for(int len=0;len<address.length();len++){
-                if(len > 0 && len % 4 ==0)
-                    sb.append(":");
-                sb.append(address.charAt(len));
-            }
-            String displayAddr = AddressUtils.displayAddress(sb.toString());
-            i.setAddress(displayAddr);
-        }
         int userCount = 0;
         try{
             userCount = userMapper.getUserCountByFilter(content);
@@ -100,7 +87,7 @@ public class UserServiceImpl implements UserService {
         if(!Pattern.matches(phoneRegexp,phoneNumber)){
             return response.responseError(10005);
         }
-        if( role<0 || role>4 ){
+        if( role<1 || role>5 ){
             return response.responseError(10006);
         }
         String emailRegexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";

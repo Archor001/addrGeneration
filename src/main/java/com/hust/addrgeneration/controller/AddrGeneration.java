@@ -25,7 +25,7 @@ public class AddrGeneration {
     public ResponseEntity<UserResponse> login(@RequestBody User userInfo) throws Exception {return userService.Login(userInfo);}
 
     // 批量获取用户
-    @GetMapping(value="/admin/user")
+    @GetMapping(value="/user")
     public ResponseEntity<UserManageResponse> manageUser(
             @RequestParam("offset") int offset,
             @RequestParam("limit") int limit,
@@ -38,30 +38,30 @@ public class AddrGeneration {
     }
 
     // 创建用户
-    @PutMapping(value = "/admin/user")
+    @PutMapping(value = "/user")
     public ResponseEntity<UserResponse> register(@RequestBody User userInfo) throws Exception {return userService.createUser(userInfo);}
 
     // 删除用户(支持批量)
-    @DeleteMapping(value = "/admin/user")
+    @DeleteMapping(value = "/user")
     public ResponseEntity<Response> deleteUser(@RequestParam("userContent") String userContent) throws Exception {return userService.deleteUser(userContent);}
 
     // 修改用户
-    @PostMapping(value = "/admin/user")
+    @PostMapping(value = "/user")
     public ResponseEntity<UserResponse> updateUser(@RequestBody User userInfo) throws Exception {return userService.updateUser(userInfo);}
 
     // 地址生成
-    @PostMapping(value = "/admin/address")
+    @PostMapping(value = "/address")
     public ResponseEntity<GenerateAddressResponse> generateAddress(@RequestBody GenerateAddress generateAddress) throws Exception { return iPv6AddrService.generateAddress(generateAddress);}
 
     // 地址查询
-    @GetMapping(value = "/admin/query")
+    @GetMapping(value = "/query")
     public ResponseEntity<QueryAddressResponse> queryAddress(@RequestParam("nid") String nid) throws Exception {return iPv6AddrService.queryAddress(nid);}
 
     // 地址溯源
-    @GetMapping(value = "/admin/address")
+    @GetMapping(value = "/address")
     public ResponseEntity<TraceAddressResponse> traceAddress(@RequestParam("queryAddress") String queryAddress) throws Exception {return iPv6AddrService.traceAddress(queryAddress);}
 
     // 地址删除
-    @DeleteMapping(value = "/admin/address")
+    @DeleteMapping(value = "/address")
     public ResponseEntity<Response> deleteAddress(@RequestParam("deleteAddress") String address) throws Exception {return iPv6AddrService.deleteAddress(address);}
 }

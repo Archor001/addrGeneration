@@ -48,32 +48,37 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             return response.responseError(10002);
         }
 
-        // step2. Calculate the time information
+        // Step2. Check if address is already applied for this nid
+        if(userMapper.getAID(nid) != null){
+            return response.responseError(10018);
+        }
+
+        // step3. Calculate the time information
         LocalDateTime localDateTime1 = LocalDateTime.now();
         LocalDateTime localDateTime2 = LocalDateTime.of(localDateTime1.getYear(), 1, 1, 0, 0, 0);
 
-        long currentTime = localDateTime1.toEpochSecond(ZoneOffset.of("+8"));
+        long registerTime = localDateTime1.toEpochSecond(ZoneOffset.of("+8"));
         long baseTime = localDateTime2.toEpochSecond(ZoneOffset.of("+8"));
 
-        int timeDifference = (int) (( currentTime - baseTime ) / stamp);
+        int timeDifference = (int) (( registerTime - baseTime ) / stamp);
         String timeInformation = ConvertUtils.decToBinString(timeDifference, 24);
         String rawAID = nid + ConvertUtils.binStringToHexString(timeInformation);
 
-        // step3. Generate AID-noTimeHash(aka AID_nTH) with UID and time information
+        // step4. Generate AID-noTimeHash(aka AID_nTH) with UID and time information
         String preAID = EncDecUtils.ideaEncrypt(rawAID, EncDecUtils.ideaKey);
         String str1 = preAID.substring(0,16);
         String str2 = preAID.substring(16,32);
 
         BigInteger big1 = new BigInteger(str1, 16);
         BigInteger big2 = new BigInteger(str2, 16);
-        String AIDnTH = big1.xor(big2).toString(16);
+        String AIDnTH = String.format("%016x", big1.xor(big2));
 
         String prefix = userMapper.getAIDnTHPrefix(AIDnTH);
         if(prefix != null){
             return response.responseError(10010);
         }
 
-        // step4. Generate AID-withTimeHash(aka AID) with AIDnTH and time-Hash
+        // step5. Generate AID-withTimeHash(aka AID) with AIDnTH and time-Hash
         LocalDateTime localDateTime3 = LocalDateTime.of(localDateTime1.getYear(),localDateTime1.getMonth(),localDateTime1.getDayOfMonth(),localDateTime1.getHour(),0,0);
         long nearestTimeHour = localDateTime3.toEpochSecond(ZoneOffset.of("+8"));
         int timeDifference2 = (int) (nearestTimeHour - baseTime);
@@ -82,17 +87,17 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         BigInteger big3 = new BigInteger(AIDnTH,16);
         BigInteger big4 = new BigInteger(timeHash, 16);
         String AID = String.format("%016x", big3.xor(big4));
-        try{
-            userMapper.updateAID(AIDnTH, big1.toString(16), AID, nid);
-        } catch (Exception e){
-            return response.responseError(10011);
-        }
-
         StringBuilder suffix = new StringBuilder();
         for (int i = 0; i < AID.length(); i+=4) {
             suffix.append(AID, i, i + 4).append(":");
         }
         String address = "2001:250:4000:4507:" + suffix.substring(0,suffix.length()-1);
+
+        try{
+            userMapper.updateAID(AIDnTH, big1.toString(16), AID, nid, registerTime, address);
+        } catch (Exception e){
+            return response.responseError(10011);
+        }
 
         response.setCode(0);
         response.setMsg("success");
@@ -105,18 +110,12 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     public ResponseEntity<QueryAddressResponse> queryAddress(String nid) throws Exception {
         QueryAddressResponse response = new QueryAddressResponse();
 
-        String AID = "";
+        String address = "";
         try{
-            AID = userMapper.getAID(nid);
+            address = userMapper.getAddress(nid);
         } catch (Exception e){
             return response.responseError(10015);
         }
-
-        StringBuilder suffix = new StringBuilder();
-        for (int i = 0; i < AID.length(); i+=4) {
-            suffix.append(AID, i, i + 4).append(":");
-        }
-        String address = "2001:250:4000:4507:" + suffix.substring(0,suffix.length()-1);
 
         response.setCode(0);
         response.setMsg("success");
@@ -158,7 +157,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         }
         BigInteger big3 = new BigInteger(AIDnTH, 16);
         BigInteger big4 = new BigInteger(prefix, 16);
-        String suffix = big3.xor(big4).toString(16);
+        String suffix = String.format("%016x", big3.xor(big4));
         String preAID = prefix + suffix;
 
         // step3. use the proper key to decrypt the encrypt data(128-bits)
@@ -174,18 +173,17 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         LocalDateTime localDateTime2 = LocalDateTime.of(LocalDate.now().getYear(), 1, 1, 0, 0, 0);
         long baseTime = localDateTime2.toEpochSecond(ZoneOffset.of("+8"));
         long registerTime = (baseTime + timeInfo);
-        Instant instant = Instant.ofEpochSecond(registerTime);
-        LocalDateTime registerTimeStr = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 
         User user = userMapper.getUser(nid);
         if(user == null){
             return response.responseError(10012);
         }
+        user.setRegisterTime(registerTime);
+        user.setAddress(queryAddress);
 
         response.setCode(0);
         response.setMsg("success");
-        response.setRegisterTime(registerTimeStr.toString());
-        response.setInfoBean(user);
+        response.setUser(user);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

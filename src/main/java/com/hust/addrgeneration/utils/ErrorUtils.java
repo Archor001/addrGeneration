@@ -42,6 +42,8 @@ public class ErrorUtils {
                 return "地址删除失败";
             case 10017:
                 return "批量获取用户失败";
+            case 10018:
+                return "此NID已生成地址";
             default:
                 return "未知错误";
         }
