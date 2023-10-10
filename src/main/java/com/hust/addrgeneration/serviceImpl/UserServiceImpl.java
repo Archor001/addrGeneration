@@ -164,7 +164,7 @@ public class UserServiceImpl implements UserService {
         if(!Pattern.matches(phoneRegexp,phoneNumber)){
             return response.responseError(10005);
         }
-        if( role<0 || role>4 ){
+        if( role<1 || role>5 ){
             return response.responseError(10006);
         }
         String emailRegexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$";
