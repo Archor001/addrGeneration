@@ -48,11 +48,6 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             return response.responseError(10002);
         }
 
-        // Step2. Check if address is already applied for this nid
-        if(userMapper.getAID(nid) != null){
-            return response.responseError(10018);
-        }
-
         // step3. Calculate the time information
         LocalDateTime localDateTime1 = LocalDateTime.now();
         LocalDateTime localDateTime2 = LocalDateTime.of(localDateTime1.getYear(), 1, 1, 0, 0, 0);
@@ -142,7 +137,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         }
         BigInteger big1 = new BigInteger(AID, 16);
         BigInteger big2 = new BigInteger(AIDnTH, 16);
-        String timeHash = big1.xor(big2).toString(16);
+        String timeHash = String.format("%016x", big1.xor(big2));
         String ideaKey = userMapper.getIdeaKey(asAddress, timeHash);
         if (ideaKey == null) {
             return response.responseError(10013);
