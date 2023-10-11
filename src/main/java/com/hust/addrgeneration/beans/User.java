@@ -12,7 +12,7 @@ public class User {
     private String emailAddress;
     private int role;
     private String address;
-    private long registerTime;
+    private String registerTime;
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
@@ -58,6 +58,6 @@ public class User {
     public void setRole(int role) {this.role = role;}
     public String getAddress() {return address;}
     public void setAddress(String address) {this.address = address;}
-    public long getRegisterTime() {return registerTime;}
-    public void setRegisterTime(long registerTime) {this.registerTime = registerTime;}
+    public String getRegisterTime() {return registerTime;}
+    public void setRegisterTime(String registerTime) {this.registerTime = registerTime;}
 }

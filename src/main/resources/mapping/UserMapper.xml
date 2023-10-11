@@ -36,8 +36,8 @@
         values (#{aidnth}, #{prefix}, #{aid}, #{nid}, #{registerTime}, #{address})
     </insert>
 
-    <select id="getAddress" parameterType="String" resultType="String">
-        select address from aidinfo where nid = #{nid}
+    <select id="getAddress" parameterType="String" resultType="com.hust.addrgeneration.beans.Address">
+        select address, registerTime from aidinfo where nid = #{nid}
     </select>
 
     <select id="getAIDnTHPrefix" parameterType="String" resultType="String">
@@ -57,13 +57,11 @@
     </delete>
 
     <select id="getUsersByFilter" resultType="com.hust.addrgeneration.beans.User">
-        select register.*, aidinfo.address, aidinfo.registerTime from register left join aidinfo on register.nid = aidinfo.nid
-        where register.username LIKE CONCAT('%',#{content},'%') OR register.name LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
+        select * from register where username LIKE CONCAT('%',#{content},'%') OR name LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="getUserCountByFilter" parameterType="String" resultType="int">
-        select COUNT(*) from register left join aidinfo on register.nid = aidinfo.nid
-        where register.username LIKE CONCAT('%',#{content},'%') OR register.name LIKE CONCAT('%',#{content},'%')
+        select COUNT(*) from register where username LIKE CONCAT('%',#{content},'%') OR name LIKE CONCAT('%',#{content},'%')
     </select>
 
 </mapper>

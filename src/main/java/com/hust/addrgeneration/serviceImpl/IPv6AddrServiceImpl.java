@@ -14,8 +14,12 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
 import java.time.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 public class IPv6AddrServiceImpl implements IPv6AddrService {
@@ -105,16 +109,23 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     public ResponseEntity<QueryAddressResponse> queryAddress(String nid) throws Exception {
         QueryAddressResponse response = new QueryAddressResponse();
 
-        String address = "";
+        List<Address> address;
         try{
             address = userMapper.getAddress(nid);
         } catch (Exception e){
             return response.responseError(10015);
         }
 
+        String[] addressArray = {};
+        for(int i=0;i<address.size();i++){
+            Address addr = address.get(i);
+            addressArray[i] = addr.getAddress();
+        }
+        String addressStr = String.join(",", addressArray);
+
         response.setCode(0);
         response.setMsg("success");
-        response.setAddress(address);
+        response.setAddress(addressStr);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -173,7 +184,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         if(user == null){
             return response.responseError(10012);
         }
-        user.setRegisterTime(registerTime);
+        user.setRegisterTime(String.valueOf(registerTime));
         user.setAddress(queryAddress);
 
         response.setCode(0);

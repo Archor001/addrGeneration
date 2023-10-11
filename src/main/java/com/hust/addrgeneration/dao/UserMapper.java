@@ -1,5 +1,6 @@
 package com.hust.addrgeneration.dao;
 
+import com.hust.addrgeneration.beans.Address;
 import com.hust.addrgeneration.beans.User;
 import com.hust.addrgeneration.beans.KeyInfo;
 import org.springframework.stereotype.Repository;
@@ -21,7 +22,7 @@ public interface UserMapper {
 
     // aidinfo表
     void updateAID(String aidnth, String prefix, String aid, String nid, long registerTime, String address);
-    String getAddress(String nid);
+    List<Address> getAddress(String nid);
     String getAIDnTHPrefix(String aidnth);
     String getAIDnTH(String aid);
     String getAID(String nid);

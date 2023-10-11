@@ -13,9 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -64,9 +67,28 @@ public class UserServiceImpl implements UserService {
         } catch (Exception e){
             return response.responseError(10017);
         }
+
+        List<User> rntUsersList = new ArrayList<>();
+        // 获取用户生成的地址
+        for(User user: users){
+            List<Address> address = userMapper.getAddress(user.getNid());
+            if(address.size() <= 0) {
+                rntUsersList.add(user);
+                continue;
+            }
+
+            String[] addressArray = address.stream().map((Address::getAddress)).toArray(String[]::new);
+            String[] registerTimeArray = address.stream().map(a -> String.valueOf(a.getRegisterTime())).toArray(String[]::new);
+            String str1 = String.join(",", addressArray);
+            String str2 = String.join(",", registerTimeArray);
+            user.setAddress(str1);
+            user.setRegisterTime(str2);
+            rntUsersList.add(user);
+        }
+
         response.setCode(0);
         response.setMsg("success");
-        response.setUsers(users);
+        response.setUsers(rntUsersList.toArray(new User[rntUsersList.size()]));
         response.setCount(userCount);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
