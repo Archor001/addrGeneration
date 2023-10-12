@@ -14,7 +14,7 @@ public class AddressUtils {
     }
 
     // 地址解析入库（加前导0）
-    public static String parseAddressToString(String addr, int byteLength){
+    public static String parseAddressSuffix(String addr, int byteLength){
         String part = "";
         String rnt = "";
         int bytes = 0;
@@ -44,7 +44,11 @@ public class AddressUtils {
             default:
                 break;
         }
-        return rnt;
+        StringBuilder suffix = new StringBuilder();
+        for (int i = 0; i < rnt.length(); i+=4) {
+            suffix.append(rnt, i, i + 4).append(":");
+        }
+        return suffix.substring(0,suffix.length()-1);
     }
 
     // 地址出库，前端展示（去前导0）

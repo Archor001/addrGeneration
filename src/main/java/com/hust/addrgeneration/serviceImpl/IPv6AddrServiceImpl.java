@@ -21,6 +21,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static com.hust.addrgeneration.utils.AddressUtils.parseAddressSuffix;
+
 @Service
 public class IPv6AddrServiceImpl implements IPv6AddrService {
     private final UserMapper userMapper;
@@ -116,6 +118,10 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             return response.responseError(10015);
         }
 
+        if(address.size() <= 0){
+            return response.responseError(10015);
+        }
+
         String[] addressArray = {};
         for(int i=0;i<address.size();i++){
             Address addr = address.get(i);
@@ -139,6 +145,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         String asPrefix = queryAddress.substring(0,pos);
         String asAddress = asPrefix + "::1";
         String aidStr = queryAddress.substring(pos+1);
+        aidStr = parseAddressSuffix(aidStr, 16);
         String AID = aidStr.replace(":","");
         String AIDnTH = "";
         try {
@@ -200,6 +207,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
         int pos = getIndexOf(address, ":", 4);
         String aidStr = address.substring(pos+1);
+        aidStr = parseAddressSuffix(aidStr, 16);
         String AID = aidStr.replace(":","");
 
         try{
