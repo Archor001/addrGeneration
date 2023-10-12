@@ -122,11 +122,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             return response.responseError(10015);
         }
 
-        String[] addressArray = {};
-        for(int i=0;i<address.size();i++){
-            Address addr = address.get(i);
-            addressArray[i] = addr.getAddress();
-        }
+        String[] addressArray = address.stream().map(Address::getAddress).toArray(String[]::new);
         String addressStr = String.join(",", addressArray);
 
         response.setCode(0);
