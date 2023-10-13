@@ -19,4 +19,4 @@ mybatis:
 
 custom:
   admin: root
-  password: d7cdb747fd512eb75b93a6d4850ddf5c
+  password: root@v6
