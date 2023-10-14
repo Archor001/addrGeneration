@@ -30,7 +30,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     // 创建用户(注册NID+地址生成)
     @Override
-    public ResponseEntity<GenerateAddressResponse> registerNID(User infoBean) {
+    public ResponseEntity<GenerateAddressResponse> register(User infoBean) {
         GenerateAddressResponse response = new GenerateAddressResponse();
 
         User user = infoBean;
@@ -126,8 +126,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         }
 
         // step0. check if address is applied
-        String address = userMapper.queryAIDTrunc(nid);
-        if(address != null){
+        if(userMapper.queryAIDTruncAddress(phoneNumber) != null){
             return response.responseError(10011);
         }
 
@@ -163,13 +162,8 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
         BigInteger big1 = new BigInteger(str1, 16);
         BigInteger big2 = new BigInteger(str2, 16);
-        String AIDnTH = big1.xor(big2).toString(16);
+        String AIDnTH = String.format("%016x", big1.xor(big2));
 
-        try{
-            userMapper.updateAIDnTH(AIDnTH, big1.toString(16));
-        } catch (Exception e) {
-            return response.responseError(10003);
-        }
         // step4. Generate AID-withTimeHash(aka AID) with AIDnTH and time-Hash
         LocalDateTime localDateTime3 = LocalDateTime.of(localDateTime1.getYear(),localDateTime1.getMonth(),localDateTime1.getDayOfMonth(),localDateTime1.getHour(),0,0);
         long nearestTimeHour = localDateTime3.toEpochSecond(ZoneOffset.of("+8"));
@@ -178,9 +172,9 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
         BigInteger big3 = new BigInteger(AIDnTH,16);
         BigInteger big4 = new BigInteger(timeHash, 16);
-        String AID = big3.xor(big4).toString(16);
+        String AID = String.format("%016x", big3.xor(big4));
         try{
-            userMapper.updateAID(AID, AIDnTH);
+            userMapper.updateAID(AID, AIDnTH, String.format("%016x", big1));
         } catch (Exception e){
             return response.responseError(10003);
         }
@@ -214,14 +208,57 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-
     // 地址查询
-    @Override
-    public ResponseEntity<QueryAddressResponse> queryAddr(QueryAddress queryAddressInfo) throws Exception {
+    public ResponseEntity<QueryAddressResponse> queryAddr(String phoneNumber) throws Exception {
         QueryAddressResponse response = new QueryAddressResponse();
 
+        List<String> rntAddressList = new ArrayList<>();
+
+        if(phoneNumber.contains(",")){
+            String[] phones = phoneNumber.split(",");
+            for(String phone: phones){
+                List<Address> addressList;
+                try{
+                    addressList = userMapper.queryAIDTruncAddress(phone);
+                } catch (Exception e){
+                    return response.responseError(10015);
+                }
+                if(addressList.size() <= 0){
+                    response.responseError(10015);
+                }
+                String[] addressArray = addressList.stream().map(Address::getAddress).toArray(String[]::new);
+                String addressStr = String.join(",", addressArray);
+                rntAddressList.add(addressStr);
+            }
+        } else {
+            List<Address> addressList;
+            try{
+                addressList = userMapper.queryAIDTruncAddress(phoneNumber);
+            } catch (Exception e){
+                return response.responseError(10015);
+            }
+            if(addressList.size() <= 0){
+                response.responseError(10015);
+            }
+            String[] addressArray = addressList.stream().map(Address::getAddress).toArray(String[]::new);
+            String addressStr = String.join(",", addressArray);
+            rntAddressList.add(addressStr);
+        }
+
+        String[] rntAddress = rntAddressList.stream().toArray(String[]::new);
+
+        response.setCode(0);
+        response.setMsg("success");
+        response.setAddress(rntAddress);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // 地址溯源
+    @Override
+    public ResponseEntity<TraceAddressResponse> traceAddr(String queryAddress) throws Exception {
+        TraceAddressResponse response = new TraceAddressResponse();
+
         // step1. revert AID
-        String queryAddress = queryAddressInfo.getQueryAddress();
         queryAddress = AddressUtils.parseAddressToString(queryAddress, 16);
         int timeDifference = 0;
         try{
@@ -239,16 +276,16 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         // step2. use prefix of the IPv6-address and calculate time-Hash to get key
         String asPrefix = "2001:250:4000:4507";
         String asAddress = asPrefix + "::1";
-        String AIDnTH = userMapper.queryAIDAIDnTH(AID);
+        String AIDnTH = userMapper.queryAIDnTH(AID);
         BigInteger big1 = new BigInteger(AID, 16);
         BigInteger big2 = new BigInteger(AIDnTH, 16);
-        String timeHash = big1.xor(big2).toString(16);
+        String timeHash = String.format("%016x", big1.xor(big2));
 
         // step3. use suffix of IPv6-address to get the whole encrypt data(128-bits)
-        String prefix = userMapper.queryAIDnTHPrefix(AIDnTH);
+        String prefix = userMapper.queryPrefix(AIDnTH);
         BigInteger big3 = new BigInteger(AIDnTH, 16);
         BigInteger big4 = new BigInteger(prefix, 16);
-        String suffix = big3.xor(big4).toString(16);
+        String suffix = String.format("%016x", big3.xor(big4));
         String preAID = prefix + suffix;
 
         // step4. use the proper key to decrypt the encrypt data(128-bits)
@@ -268,19 +305,13 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         LocalDateTime localDateTime2 = LocalDateTime.of(LocalDate.now().getYear(), 1, 1, 0, 0, 0);
         long baseTime = localDateTime2.toEpochSecond(ZoneOffset.of("+8"));
         long registerTime = (baseTime + timeInfo);
-        Instant instant = Instant.ofEpochSecond(registerTime);
-        LocalDateTime registerTimeStr = LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
 
         User userInfo = userMapper.queryRegisterInfo(nid);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("userID", userInfo.getUserID());
-        jsonObject.put("phoneNumber", userInfo.getPhoneNumber());
-        jsonObject.put("registerTime", registerTimeStr.toString());
-        jsonObject.put("username", userInfo.getUsername());
+        userInfo.setRegisterTime(registerTime);
 
         response.setCode(0);
         response.setMsg("success");
-        response.setInfo(jsonObject);
+        response.setUser(userInfo);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

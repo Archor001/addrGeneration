@@ -23,21 +23,16 @@
     </select>
 
     <insert id="updateAID" parameterType="String">
-        insert into aid (AIDnTH, AID)
-        values (#{AIDnTH}, #{AID})
+        insert into aid_info (aidnth, aid, prefix)
+        values (#{AIDnTH}, #{AID}, #{prefix})
     </insert>
 
-    <select id="queryAIDAIDnTH" parameterType="String" resultType="String">
-        select AIDnTH from aid where AID = #{AID}
+    <select id="queryAIDnTH" parameterType="String" resultType="String">
+        select aidnth from aid_info where aid = #{AID}
     </select>
 
-    <insert id="updateAIDnTH" parameterType="String">
-        insert into aid_nth (aidnth, prefix)
-        values (#{aidnth}, #{prefix})
-    </insert>
-
-    <select id="queryAIDnTHPrefix" parameterType="String" resultType="String">
-        select prefix from aid_nth where aidnth = #{aidnth}
+    <select id="queryPrefix" parameterType="String" resultType="String">
+        select prefix from aid_info where aidnth = #{aidnth}
     </select>
 
     <insert id="updateAIDTrunc">
@@ -57,8 +52,8 @@
         select timeDifference from aid_trunc where address = #{address}
     </select>
 
-    <select id="queryAIDTrunc" parameterType="String" resultType="String">
-        select address from aid_trunc where nid = #{nid}
+    <select id="queryAIDTruncAddress" parameterType="String" resultType="com.hust.addrgeneration.beans.Address">
+        select address,registerTime from aid_trunc where phoneNumber = #{phoneNumber}
     </select>
 
     <select id="getIdeaKey" parameterType="String" resultType="String">

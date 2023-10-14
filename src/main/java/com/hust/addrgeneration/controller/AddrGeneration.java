@@ -2,7 +2,6 @@ package com.hust.addrgeneration.controller;
 
 import com.hust.addrgeneration.beans.*;
 import com.hust.addrgeneration.service.IPv6AddrService;
-import com.hust.addrgeneration.service.IPv6Service;
 import com.hust.addrgeneration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,13 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class AddrGeneration {
-    private final IPv6Service ipv6Service;
     private final IPv6AddrService iPv6AddrService;
     private final UserService userService;
 
     @Autowired
-    public AddrGeneration(@Qualifier("IPv6ServiceImpl") IPv6Service iPv6Service, IPv6AddrService iPv6AddrService, UserService userService) {
-        this.ipv6Service = iPv6Service;
+    public AddrGeneration(IPv6AddrService iPv6AddrService, UserService userService) {
         this.iPv6AddrService = iPv6AddrService;
         this.userService = userService;
     }
@@ -31,7 +28,7 @@ public class AddrGeneration {
     // 用户注册(申请NID)
     @PutMapping(value = "/admin/user")
     public ResponseEntity<GenerateAddressResponse> register(@RequestBody User userInfo) throws Exception {
-        return iPv6AddrService.registerNID(userInfo);
+        return iPv6AddrService.register(userInfo);
     }
 
     // 批量获取用户
@@ -60,11 +57,15 @@ public class AddrGeneration {
     }
 
     // 地址查询
+    @GetMapping(value = "/admin/query")
+    public ResponseEntity<QueryAddressResponse> queryAddress(@RequestParam("phoneNumber") String phoneNumber) throws Exception {
+        return iPv6AddrService.queryAddr(phoneNumber);
+    }
+
+    // 地址溯源
     @GetMapping(value = "/admin/address")
-    public ResponseEntity<QueryAddressResponse> queryAddr(@RequestParam("queryAddress") String queryAddress) throws Exception {
-        QueryAddress queryAddressInfo = new QueryAddress();
-        queryAddressInfo.setQueryAddress(queryAddress);
-        return iPv6AddrService.queryAddr(queryAddressInfo);
+    public ResponseEntity<TraceAddressResponse> traceAddress(@RequestParam("queryAddress") String queryAddress) throws Exception {
+        return iPv6AddrService.traceAddr(queryAddress);
     }
 
     // 修改ISP地址前缀（自动重新生成地址）
