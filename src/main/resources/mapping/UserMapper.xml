@@ -32,8 +32,8 @@
     </select>
 
     <insert id="updateAID">
-        insert into aidinfo (aidnth, prefix, aid, nid, registerTime, address)
-        values (#{aidnth}, #{prefix}, #{aid}, #{nid}, #{registerTime}, #{address})
+        insert into aidinfo (aidnth, prefix, aid, nid, registerTime, address, status)
+        values (#{aidnth}, #{prefix}, #{aid}, #{nid}, #{registerTime}, #{address}, #{status})
     </insert>
 
     <select id="getAddress" parameterType="String" resultType="com.hust.addrgeneration.beans.Address">
@@ -65,7 +65,7 @@
     </select>
 
     <select id="getAddressesByFilter" resultType="com.hust.addrgeneration.beans.Address">
-        select register.username, user.name, register.nid from user left join aidinfo on register.nid = aidinfo.nid
+        select user.username, user.name, user.nid, aidinfo.address, aidinfo.registerTime, aidinfo.status from user left join aidinfo on user.nid = aidinfo.nid
         where username LIKE CONCAT('%',#{content},'%') OR name LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
     </select>
 

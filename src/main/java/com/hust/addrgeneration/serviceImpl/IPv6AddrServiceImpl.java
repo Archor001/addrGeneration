@@ -121,7 +121,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         String address = "2001:250:4000:4507:" + suffix.substring(0,suffix.length()-1);
 
         try{
-            userMapper.updateAID(AIDnTH, big1.toString(16), AID, nid, registerTime, address);
+            userMapper.updateAID(AIDnTH, big1.toString(16), AID, nid, registerTime, address, 1);
         } catch (Exception e){
             return response.responseError(10011);
         }

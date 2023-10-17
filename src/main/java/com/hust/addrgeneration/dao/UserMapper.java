@@ -21,7 +21,7 @@ public interface UserMapper {
     String getIdeaKey(String addrGenIP, String timeHash);
 
     // aidinfo表
-    void updateAID(String aidnth, String prefix, String aid, String nid, long registerTime, String address);
+    void updateAID(String aidnth, String prefix, String aid, String nid, long registerTime, String address, int status);
     List<Address> getAddress(String nid);
     String getAIDnTHPrefix(String aidnth);
     String getAIDnTH(String aid);
