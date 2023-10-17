@@ -2,24 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.hust.addrgeneration.dao.UserMapper">
     <insert id="register">
-        insert into register (nid, username, phoneNumber, password, name, emailAddress, role)
-        values (#{nid}, #{username}, #{phoneNumber}, #{password}, #{name}, #{emailAddress}, #{role})
+        insert into user (nid, username, phoneNumber, password, name, emailAddress, role, status)
+        values (#{nid}, #{username}, #{phoneNumber}, #{password}, #{name}, #{emailAddress}, #{role}, #{status})
     </insert>
 
     <delete id="deleteUser" parameterType="String">
-        delete from register where nid = #{userContent} or username = #{userContent}
+        delete from user where nid = #{userContent} or username = #{userContent}
     </delete>
 
     <update id="updateUser" parameterType="com.hust.addrgeneration.beans.User">
-        update register set nid = #{nid}, name = #{name}, password = #{password}, phoneNumber = #{phoneNumber}, role = #{role}, emailAddress = #{emailAddress} where username = #{username}
+        update user set nid = #{nid}, name = #{name}, password = #{password}, phoneNumber = #{phoneNumber}, role = #{role}, emailAddress = #{emailAddress} where username = #{username}
     </update>
 
     <select id="getUser" parameterType="String" resultType="com.hust.addrgeneration.beans.User">
-        select * from register where nid = #{nid}
+        select * from user where nid = #{nid}
     </select>
 
     <select id="getPasswordFromNID" parameterType="String" resultType="String">
-        select password from register where nid = #{nid}
+        select password from user where nid = #{nid}
     </select>
 
     <insert id="updateKey" parameterType="com.hust.addrgeneration.beans.KeyInfo">
@@ -57,11 +57,21 @@
     </delete>
 
     <select id="getUsersByFilter" resultType="com.hust.addrgeneration.beans.User">
-        select * from register where username LIKE CONCAT('%',#{content},'%') OR name LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
+        select * from user where username LIKE CONCAT('%',#{content},'%') OR name LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="getUserCountByFilter" parameterType="String" resultType="int">
-        select COUNT(*) from register where username LIKE CONCAT('%',#{content},'%') OR name LIKE CONCAT('%',#{content},'%')
+        select COUNT(*) from user where username LIKE CONCAT('%',#{content},'%') OR name LIKE CONCAT('%',#{content},'%')
+    </select>
+
+    <select id="getAddressesByFilter" resultType="com.hust.addrgeneration.beans.Address">
+        select register.username, user.name, register.nid from user left join aidinfo on register.nid = aidinfo.nid
+        where username LIKE CONCAT('%',#{content},'%') OR name LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="getAddressCountByFilter" parameterType="String" resultType="int">
+        select COUNT(*) from user left join aidinfo on user.nid = aidinfo.nid
+        where username LIKE CONCAT('%',#{content},'%') OR name LIKE CONCAT('%',#{content},'%')
     </select>
 
 </mapper>

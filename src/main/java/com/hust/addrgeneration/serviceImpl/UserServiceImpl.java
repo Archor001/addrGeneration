@@ -47,14 +47,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<UserManageResponse> FilterUsers(UserManage um) {
+    public ResponseEntity<UserManageResponse> FilterUsers(int offset, int limit, String content) {
         UserManageResponse response = new UserManageResponse();
 
-        int offset = um.getOffset();
-        int limit = um.getLimit();
-        String content = um.getContent();
         List<User> userList;
-
         try{
             userList = userMapper.getUsersByFilter(offset, limit, content);
         } catch (Exception e) {
@@ -122,7 +118,7 @@ public class UserServiceImpl implements UserService {
 
         // Step3. 写入数据库
         try {
-            userMapper.register(nid, password, username, phoneNumber, name, emailAddress, role);
+            userMapper.register(nid, password, username, phoneNumber, name, emailAddress, role, 1);
         } catch (Exception e) {
             return response.responseError(10003);
         }

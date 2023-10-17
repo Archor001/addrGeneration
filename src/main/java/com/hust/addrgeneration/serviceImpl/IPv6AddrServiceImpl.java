@@ -34,6 +34,32 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         this.userMapper = userMapper;
     }
 
+    // 批量地址查询
+    @Override
+    public ResponseEntity<AddressManageResponse> filterAddress(int offset, int limit, String content) throws Exception {
+        AddressManageResponse response = new AddressManageResponse();
+
+        List<Address> addressList = new ArrayList<>();
+        try{
+            addressList = userMapper.getAddressesByFilter(offset, limit ,content);
+        } catch (Exception e) {
+            return response.responseError(10019);
+        }
+
+        int addressCount = 0;
+        try{
+            addressCount = userMapper.getAddressCountByFilter(content);
+        } catch (Exception e){
+            return response.responseError(10019);
+        }
+
+        response.setCode(0);
+        response.setMsg("success");
+        response.setAddresses(addressList.toArray(new Address[addressList.size()]));
+        response.setCount(addressCount);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     // 地址生成
     @Override
     public ResponseEntity<GenerateAddressResponse> generateAddress(GenerateAddress generateAddress) throws Exception {

@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface UserMapper {
     // register表
-    void register(String nid, String password, String username, String phoneNumber, String name, String emailAddress, int role);
+    void register(String nid, String password, String username, String phoneNumber, String name, String emailAddress, int role, int status);
     void deleteUser(String userContent);
     void updateUser(User infoBean);
     User getUser(String nid);
@@ -31,4 +31,6 @@ public interface UserMapper {
     // 联合查询
     List<User> getUsersByFilter(int offset, int limit, String content);
     int getUserCountByFilter(String content);
+    List<Address> getAddressesByFilter(int offset, int limit, String content);
+    int getAddressCountByFilter(String content);
 }

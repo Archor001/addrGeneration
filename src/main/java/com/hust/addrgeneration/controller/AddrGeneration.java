@@ -2,10 +2,8 @@ package com.hust.addrgeneration.controller;
 
 import com.hust.addrgeneration.beans.*;
 import com.hust.addrgeneration.service.IPv6AddrService;
-import com.hust.addrgeneration.service.IPv6Service;
 import com.hust.addrgeneration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,16 +23,12 @@ public class AddrGeneration {
     public ResponseEntity<UserResponse> login(@RequestBody User userInfo) throws Exception {return userService.Login(userInfo);}
 
     // 批量获取用户
-    @GetMapping(value="/user")
+    @GetMapping(value="/users")
     public ResponseEntity<UserManageResponse> manageUser(
             @RequestParam("offset") int offset,
             @RequestParam("limit") int limit,
             @RequestParam("content") String content) throws Exception {
-        UserManage um = new UserManage();
-        um.setOffset(offset);
-        um.setLimit(limit);
-        um.setContent(content);
-        return userService.FilterUsers(um);
+        return userService.FilterUsers(offset, limit, content);
     }
 
     // 创建用户
@@ -48,6 +42,15 @@ public class AddrGeneration {
     // 修改用户
     @PostMapping(value = "/user")
     public ResponseEntity<UserResponse> updateUser(@RequestBody User userInfo) throws Exception {return userService.updateUser(userInfo);}
+
+    // 批量获取地址
+    @GetMapping(value = "/addresses")
+    public ResponseEntity<AddressManageResponse> filterAddress(
+            @RequestParam("offset") int offset,
+            @RequestParam("limit") int limit,
+            @RequestParam("content") String content) throws Exception {
+        return iPv6AddrService.filterAddress(offset,limit,content);
+    }
 
     // 地址生成
     @PostMapping(value = "/address")

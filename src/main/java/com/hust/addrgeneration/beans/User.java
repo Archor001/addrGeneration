@@ -11,6 +11,7 @@ public class User {
     private String nid;
     private String emailAddress;
     private int role;
+    private int status;
     private String address;
     private String registerTime;
 
@@ -56,6 +57,8 @@ public class User {
         return role;
     }
     public void setRole(int role) {this.role = role;}
+    public int getStatus() {return status;}
+    public void setStatus(int status) {this.status = status;}
     public String getAddress() {return address;}
     public void setAddress(String address) {this.address = address;}
     public String getRegisterTime() {return registerTime;}
