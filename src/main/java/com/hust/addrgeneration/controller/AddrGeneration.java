@@ -2,6 +2,7 @@ package com.hust.addrgeneration.controller;
 
 import com.hust.addrgeneration.beans.*;
 import com.hust.addrgeneration.service.IPv6AddrService;
+import com.hust.addrgeneration.service.SystemService;
 import com.hust.addrgeneration.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -11,11 +12,13 @@ import org.springframework.web.bind.annotation.*;
 public class AddrGeneration {
     private final IPv6AddrService iPv6AddrService;
     private final UserService userService;
+    private final SystemService systemService;
 
     @Autowired
-    public AddrGeneration(IPv6AddrService iPv6AddrService, UserService userService) {
+    public AddrGeneration(IPv6AddrService iPv6AddrService, UserService userService, SystemService systemService) {
         this.iPv6AddrService = iPv6AddrService;
         this.userService = userService;
+        this.systemService = systemService;
     }
 
     // 登录
@@ -67,4 +70,11 @@ public class AddrGeneration {
     // 地址删除
     @DeleteMapping(value = "/address")
     public ResponseEntity<?> deleteAddress(@RequestParam("deleteAddress") String address) throws Exception {return iPv6AddrService.deleteAddress(address);}
+
+    // 系统配置
+    @GetMapping(value = "/system")
+    public ResponseEntity<?> getSystemConfig() throws Exception {return systemService.getSystemConfig();}
+
+    @PostMapping(value = "/system")
+    public ResponseEntity<?> updateSystemConfig(@RequestBody SystemConfig config) throws Exception {return systemService.updateSystemConfig(config);}
 }
