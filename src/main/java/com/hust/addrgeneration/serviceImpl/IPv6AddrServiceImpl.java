@@ -216,16 +216,27 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         long baseTime = localDateTime2.toEpochSecond(ZoneOffset.of("+8"));
         long registerTime = (baseTime + timeInfo);
 
-        User user = userMapper.getUser(nid);
-        if(user == null){
+        User user;
+        try {
+            user = userMapper.getUser(nid);
+        } catch (Exception e) {
             return response.responseError(10012);
         }
-        user.setRegisterTime(String.valueOf(registerTime));
-        user.setAddress(queryAddress);
+        UserAddress userAddress = new UserAddress();
+        userAddress.setUsername(user.getUsername());
+        userAddress.setPassword(user.getPassword());
+        userAddress.setPhoneNumber(user.getPhoneNumber());
+        userAddress.setName(user.getName());
+        userAddress.setNid(user.getNid());
+        userAddress.setEmailAddress(user.getEmailAddress());
+        userAddress.setRole(user.getRole());
+        userAddress.setStatus(user.getStatus());
+        userAddress.setAddress(queryAddress);
+        userAddress.setRegisterTime(String.valueOf(registerTime));
 
         response.setCode(0);
         response.setMsg("success");
-        response.setUser(user);
+        response.setUser(userAddress);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

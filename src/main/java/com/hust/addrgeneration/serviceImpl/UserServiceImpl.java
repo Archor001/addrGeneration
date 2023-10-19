@@ -50,13 +50,13 @@ public class UserServiceImpl implements UserService {
     public ResponseEntity<?> FilterUsers(int offset, int limit, String content) {
         UserManageResponse response = new UserManageResponse();
 
-        List<User> userList;
+        List<UserAddress> userList;
         try{
             userList = userMapper.getUsersByFilter(offset, limit, content);
         } catch (Exception e) {
             return response.responseError(10017);
         }
-        User[] users = userList.toArray(new User[userList.size()]);
+        UserAddress[] users = userList.toArray(new UserAddress[userList.size()]);
         int userCount = 0;
         try{
             userCount = userMapper.getUserCountByFilter(content);
@@ -64,9 +64,9 @@ public class UserServiceImpl implements UserService {
             return response.responseError(10017);
         }
 
-        List<User> rntUsersList = new ArrayList<>();
+        List<UserAddress> rntUsersList = new ArrayList<>();
         // 获取用户生成的地址
-        for(User user: users){
+        for(UserAddress user: users){
             List<Address> address = userMapper.getAddress(user.getNid());
             if(address.size() <= 0) {
                 rntUsersList.add(user);
@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
 
         response.setCode(0);
         response.setMsg("success");
-        response.setUsers(rntUsersList.toArray(new User[rntUsersList.size()]));
+        response.setUsers(rntUsersList.toArray(new UserAddress[rntUsersList.size()]));
         response.setCount(userCount);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

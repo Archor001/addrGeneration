@@ -3,6 +3,7 @@ package com.hust.addrgeneration.dao;
 import com.hust.addrgeneration.beans.Address;
 import com.hust.addrgeneration.beans.User;
 import com.hust.addrgeneration.beans.KeyInfo;
+import com.hust.addrgeneration.beans.UserAddress;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public interface UserMapper {
     void deleteAID(String aid);
 
     // 联合查询
-    List<User> getUsersByFilter(int offset, int limit, String content);
+    List<UserAddress> getUsersByFilter(int offset, int limit, String content);
     int getUserCountByFilter(String content);
     List<Address> getAddressesByFilter(int offset, int limit, String content);
     int getAddressCountByFilter(String content);

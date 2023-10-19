@@ -56,7 +56,7 @@
         delete from aidinfo where aid = #{aid}
     </delete>
 
-    <select id="getUsersByFilter" resultType="com.hust.addrgeneration.beans.User">
+    <select id="getUsersByFilter" resultType="com.hust.addrgeneration.beans.UserAddress">
         select * from user where username LIKE CONCAT('%',#{content},'%') OR name LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
     </select>
 
