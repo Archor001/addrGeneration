@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 
 public class QueryAddressResponse extends Response{
     private String address;
+    private User user;
     public QueryAddressResponse(){};
     public QueryAddressResponse(int code, String msg, String address) {
         super(code, msg);
@@ -14,6 +15,8 @@ public class QueryAddressResponse extends Response{
     }
     public void setAddress(String address) {this.address=address;}
     public String getAddress() {return address;}
+    public void setUser(User user) {this.user = user;}
+    public User getUser() {return user;}
     public ResponseEntity<QueryAddressResponse> responseError(int code){
         this.setCode(code);
         this.setMsg(ErrorUtils.message(code));

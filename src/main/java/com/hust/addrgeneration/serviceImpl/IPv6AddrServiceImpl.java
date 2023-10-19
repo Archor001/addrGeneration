@@ -143,17 +143,24 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         } catch (Exception e){
             return response.responseError(10015);
         }
-
-        if(address.size() <= 0){
-            return response.responseError(10015);
+        if(address.isEmpty()){
+            return response.responseError(10020);
         }
 
         String[] addressArray = address.stream().map(Address::getAddress).toArray(String[]::new);
         String addressStr = String.join(",", addressArray);
 
+        User user;
+        try{
+            user = userMapper.getUser(nid);
+        } catch (Exception e) {
+            return response.responseError(10015);
+        }
+
         response.setCode(0);
         response.setMsg("success");
         response.setAddress(addressStr);
+        response.setUser(user);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

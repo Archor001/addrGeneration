@@ -45,7 +45,9 @@ public class ErrorUtils {
             case 10018:
                 return "此NID已生成地址";
             case 10019:
-                return "批量地址查询失败";
+                return "批量获取地址失败";
+            case 10020:
+                return "此NID未创建任何地址";
             default:
                 return "未知错误";
         }

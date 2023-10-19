@@ -65,12 +65,12 @@
     </select>
 
     <select id="getAddressesByFilter" resultType="com.hust.addrgeneration.beans.Address">
-        select user.username, user.name, user.nid, aidinfo.address, aidinfo.registerTime, aidinfo.status from user left join aidinfo on user.nid = aidinfo.nid
+        select aidinfo.address, aidinfo.registerTime, aidinfo.status, user.username, user.name, user.nid from aidinfo left join user on aidinfo.nid = user.nid
         where username LIKE CONCAT('%',#{content},'%') OR name LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="getAddressCountByFilter" parameterType="String" resultType="int">
-        select COUNT(*) from user left join aidinfo on user.nid = aidinfo.nid
+        select COUNT(*) from aidinfo left join user on aidinfo.nid = user.nid
         where username LIKE CONCAT('%',#{content},'%') OR name LIKE CONCAT('%',#{content},'%')
     </select>
 
