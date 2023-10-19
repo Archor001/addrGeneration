@@ -48,6 +48,14 @@ public class ErrorUtils {
                 return "批量获取地址失败";
             case 10020:
                 return "此NID未创建任何地址";
+            case 10021:
+                return "地址停用失败";
+            case 10022:
+                return "用户停用失败";
+            case 10023:
+                return "地址已停用";
+            case 10024:
+                return "用户已停用";
             default:
                 return "未知错误";
         }

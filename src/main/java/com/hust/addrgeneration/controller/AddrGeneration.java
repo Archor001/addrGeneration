@@ -38,6 +38,10 @@ public class AddrGeneration {
     @PutMapping(value = "/user")
     public ResponseEntity<?> register(@RequestBody User userInfo) throws Exception {return userService.createUser(userInfo);}
 
+    // 停用用户
+    @PostMapping(value = "/user/suspend")
+    public ResponseEntity<?> suspendUser(@RequestBody String nid) throws Exception {return userService.suspendUser(nid);}
+
     // 删除用户(支持批量)
     @DeleteMapping(value = "/user")
     public ResponseEntity<?> deleteUser(@RequestParam("userContent") String userContent) throws Exception {return userService.deleteUser(userContent);}
@@ -67,6 +71,10 @@ public class AddrGeneration {
     @GetMapping(value = "/address")
     public ResponseEntity<?> traceAddress(@RequestParam("queryAddress") String queryAddress) throws Exception {return iPv6AddrService.traceAddress(queryAddress);}
 
+    // 地址停用
+    @PostMapping(value = "/address/suspend")
+    public ResponseEntity<?> suspendAddress(@RequestBody String address) throws Exception {return iPv6AddrService.suspendAddress(address);}
+
     // 地址删除
     @DeleteMapping(value = "/address")
     public ResponseEntity<?> deleteAddress(@RequestParam("deleteAddress") String address) throws Exception {return iPv6AddrService.deleteAddress(address);}
@@ -74,7 +82,6 @@ public class AddrGeneration {
     // 系统配置
     @GetMapping(value = "/system")
     public ResponseEntity<?> getSystemConfig() throws Exception {return systemService.getSystemConfig();}
-
     @PostMapping(value = "/system")
     public ResponseEntity<?> updateSystemConfig(@RequestBody SystemConfig config) throws Exception {return systemService.updateSystemConfig(config);}
 }

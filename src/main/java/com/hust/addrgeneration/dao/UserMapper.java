@@ -12,7 +12,8 @@ import java.util.List;
 public interface UserMapper {
     // register表
     void register(String nid, String password, String username, String phoneNumber, String name, String emailAddress, int role, int status);
-    void deleteUser(String userContent);
+    void suspendUser(String userContent);       // 停用用户，设置status字段为2
+    void deleteUser(String userContent);        // 标记删除用户，设置status字段为3
     void updateUser(User infoBean);
     User getUser(String nid);
     String getPasswordFromNID(String nid);
@@ -26,8 +27,9 @@ public interface UserMapper {
     List<Address> getAddress(String nid);
     String getAIDnTHPrefix(String aidnth);
     String getAIDnTH(String aid);
-    String getAID(String nid);
-    void deleteAID(String aid);
+    int getAIDStatus(String aid);
+    void suspendAID(String aid);            // 停用地址（设置status字段为2 ）
+    void deleteAID(String aid);             // 标记删除地址（设置status字段为3）
 
     // 联合查询
     List<UserAddress> getUsersByFilter(int offset, int limit, String content);

@@ -80,6 +80,17 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             return response.responseError(10002);
         }
 
+        // Step2. Check if the user is suspended
+        User user;
+        try{
+            user = userMapper.getUser(nid);
+            if(user.getStatus() == 2){
+                return response.responseError(10024);
+            }
+        } catch (Exception e){
+            return response.responseError(10011);
+        }
+
         // step3. Calculate the time information
         LocalDateTime localDateTime1 = LocalDateTime.now();
         LocalDateTime localDateTime2 = LocalDateTime.of(localDateTime1.getYear(), 1, 1, 0, 0, 0);
@@ -137,6 +148,16 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     public ResponseEntity<?> queryAddress(String nid) throws Exception {
         QueryAddressResponse response = new QueryAddressResponse();
 
+        // 检查用户是否停用
+        try {
+            User user = userMapper.getUser(nid);
+            if (user.getStatus() == 2) {
+                return response.responseError(10024);
+            }
+        } catch (Exception e){
+            return response.responseError(10015);
+        }
+
         List<Address> address;
         try{
             address = userMapper.getAddress(nid);
@@ -168,6 +189,20 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     @Override
     public ResponseEntity<?> traceAddress(String queryAddress) throws Exception {
         TraceAddressResponse response = new TraceAddressResponse();
+
+        // Step0. check if the address is suspended
+        try{
+            int pos = getIndexOf(queryAddress, ":", 4);
+            String aidStr = queryAddress.substring(pos+1);
+            aidStr = parseAddressSuffix(aidStr, 16);
+            String AID = aidStr.replace(":","");
+            int status = userMapper.getAIDStatus(AID);
+            if(status == 2){
+                return response.responseError(10023);
+            }
+        } catch (Exception e){
+            return response.responseError(10012);
+        }
 
         // step1. use prefix of the IPv6-address and calculate time-Hash to get key
         int pos = getIndexOf(queryAddress, ":", 4);
@@ -237,6 +272,27 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         response.setCode(0);
         response.setMsg("success");
         response.setUser(userAddress);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // 地址停用
+    @Override
+    public ResponseEntity<?> suspendAddress(String address) throws Exception {
+        Response response = new Response();
+
+        int pos = getIndexOf(address, ":", 4);
+        String aidStr = address.substring(pos+1);
+        aidStr = parseAddressSuffix(aidStr, 16);
+        String AID = aidStr.replace(":","");
+
+        try{
+            userMapper.suspendAID(AID);
+        } catch (Exception e){
+            return response.responseError(10021);
+        }
+
+        response.setCode(0);
+        response.setMsg("success");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

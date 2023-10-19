@@ -6,9 +6,15 @@
         values (#{nid}, #{username}, #{phoneNumber}, #{password}, #{name}, #{emailAddress}, #{role}, #{status})
     </insert>
 
-    <delete id="deleteUser" parameterType="String">
-        delete from user where nid = #{userContent} or username = #{userContent}
-    </delete>
+    <update id="suspendUser" parameterType="String">
+        update user <set> status = 2 </set> where nid = #{userContent} or username = #{userContent}
+    </update>
+
+    <update id="deleteUser" parameterType="String">
+        update user <set>status = 3</set> where nid = #{userContent} or username = #{userContent};
+        update aidinfo <set>status = 3</set> where nid = #{userContent};
+        update aidinfo LEFT JOIN user on aidinfo.nid = user.nid <set>aidinfo.status = 3</set> where user.username = #{userContent};
+    </update>
 
     <update id="updateUser" parameterType="com.hust.addrgeneration.beans.User">
         update user set nid = #{nid}, name = #{name}, password = #{password}, phoneNumber = #{phoneNumber}, role = #{role}, emailAddress = #{emailAddress} where username = #{username}
@@ -48,13 +54,17 @@
         select aidnth from aidinfo where aid = #{aid}
     </select>
 
-    <select id="getAID" parameterType="String" resultType="String">
-        select aid from aidinfo where nid = #{nid}
+    <select id="getAIDStatus" parameterType="String" resultType="int">
+        select status from aidinfo where aid = #{aid}
     </select>
 
-    <delete id="deleteAID" parameterType="String">
-        delete from aidinfo where aid = #{aid}
-    </delete>
+    <update id="suspendAID" parameterType="String">
+        update aidinfo <set>status = 2</set> where aid = #{aid}
+    </update>
+
+    <update id="deleteAID" parameterType="String">
+        update aidinfo <set>status = 3</set> where aid = #{aid}
+    </update>
 
     <select id="getUsersByFilter" resultType="com.hust.addrgeneration.beans.UserAddress">
         select * from user where username LIKE CONCAT('%',#{content},'%') OR name LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}

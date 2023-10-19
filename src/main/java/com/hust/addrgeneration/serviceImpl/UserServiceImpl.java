@@ -128,6 +128,20 @@ public class UserServiceImpl implements UserService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    // 停用用户
+    @Override
+    public ResponseEntity<?> suspendUser(String nid) throws Exception {
+        Response response = new Response();
+        try{
+            userMapper.suspendUser(nid);
+        } catch (Exception e){
+            return response.responseError(10022);
+        }
+        response.setMsg("success");
+        response.setCode(0);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     // 删除用户
     @Override
     public ResponseEntity<?> deleteUser(String userContent) throws  Exception {
@@ -144,7 +158,7 @@ public class UserServiceImpl implements UserService {
         } else {
             try {
                 userMapper.deleteUser(userContent);
-            } catch (Exception e){
+            } catch (Exception e) {
                 return response.responseError(10004);
             }
         }
@@ -170,7 +184,12 @@ public class UserServiceImpl implements UserService {
             return response.responseError(10008);
         }
 
-        // Step2. 检查参数合法性
+        // Step2. 检查用户是否停用
+        if(user.getStatus() == 2){
+            return response.responseError(10024);
+        }
+
+        // Step3. 检查参数合法性
         String username = user.getUsername();
         String password = infoBean.getPassword();
         String name = infoBean.getName();
@@ -187,7 +206,7 @@ public class UserServiceImpl implements UserService {
             return response.responseError(10007);
         }
 
-        // Step3. 重新生成NID
+        // Step4. 重新生成NID
         String newNID = generateNID(username,phoneNumber,name);
         if(password != null) user.setPassword(password);
         if(name != null) user.setName(name);
@@ -196,7 +215,7 @@ public class UserServiceImpl implements UserService {
         if(role>=1&&role<=5) user.setRole(role);
         user.setNid(newNID);
 
-        // Step4. 数据库更新
+        // Step5. 数据库更新
         try{
             userMapper.updateUser(user);
         } catch (Exception e){
