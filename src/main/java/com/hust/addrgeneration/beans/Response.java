@@ -29,9 +29,10 @@ public class Response {
     public void setMsg(String msg) {
         this.msg = msg;
     }
-    public ResponseEntity<Response> responseNormalError(int code){
-        this.setCode(code);
-        this.setMsg(ErrorUtils.message(code));
-        return new ResponseEntity<>(this, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<Response> responseError(int code){
+        Response resp = new Response();
+        resp.setCode(code);
+        resp.setMsg(ErrorUtils.message(code));
+        return new ResponseEntity<>(resp, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -16,12 +16,6 @@ public class AddressManageResponse extends Response{
 
     public Address[] getAddresses() { return addresses; }
     public void setAddresses(Address[] addresses) { this.addresses = addresses; }
-
     public int getCount() { return count; }
     public void setCount(int count) { this.count = count; }
-    public ResponseEntity<AddressManageResponse> responseError(int code){
-        this.setCode(code);
-        this.setMsg(ErrorUtils.message(code));
-        return new ResponseEntity<>(this, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }

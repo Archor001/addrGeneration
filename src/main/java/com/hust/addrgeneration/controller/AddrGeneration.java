@@ -20,11 +20,11 @@ public class AddrGeneration {
 
     // 登录
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody User userInfo) throws Exception {return userService.Login(userInfo);}
+    public ResponseEntity<?> login(@RequestBody User userInfo) throws Exception {return userService.Login(userInfo);}
 
     // 批量获取用户
     @GetMapping(value="/users")
-    public ResponseEntity<UserManageResponse> manageUser(
+    public ResponseEntity<?> manageUser(
             @RequestParam("offset") int offset,
             @RequestParam("limit") int limit,
             @RequestParam("content") String content) throws Exception {
@@ -33,19 +33,19 @@ public class AddrGeneration {
 
     // 创建用户
     @PutMapping(value = "/user")
-    public ResponseEntity<UserResponse> register(@RequestBody User userInfo) throws Exception {return userService.createUser(userInfo);}
+    public ResponseEntity<?> register(@RequestBody User userInfo) throws Exception {return userService.createUser(userInfo);}
 
     // 删除用户(支持批量)
     @DeleteMapping(value = "/user")
-    public ResponseEntity<Response> deleteUser(@RequestParam("userContent") String userContent) throws Exception {return userService.deleteUser(userContent);}
+    public ResponseEntity<?> deleteUser(@RequestParam("userContent") String userContent) throws Exception {return userService.deleteUser(userContent);}
 
     // 修改用户
     @PostMapping(value = "/user")
-    public ResponseEntity<UserResponse> updateUser(@RequestBody User userInfo) throws Exception {return userService.updateUser(userInfo);}
+    public ResponseEntity<?> updateUser(@RequestBody User userInfo) throws Exception {return userService.updateUser(userInfo);}
 
     // 批量获取地址
     @GetMapping(value = "/addresses")
-    public ResponseEntity<AddressManageResponse> filterAddress(
+    public ResponseEntity<?> filterAddress(
             @RequestParam("offset") int offset,
             @RequestParam("limit") int limit,
             @RequestParam("content") String content) throws Exception {
@@ -54,17 +54,17 @@ public class AddrGeneration {
 
     // 地址生成
     @PostMapping(value = "/address")
-    public ResponseEntity<GenerateAddressResponse> generateAddress(@RequestBody GenerateAddress generateAddress) throws Exception { return iPv6AddrService.generateAddress(generateAddress);}
+    public ResponseEntity<?> generateAddress(@RequestBody GenerateAddress generateAddress) throws Exception { return iPv6AddrService.generateAddress(generateAddress);}
 
     // 地址查询
     @GetMapping(value = "/query")
-    public ResponseEntity<QueryAddressResponse> queryAddress(@RequestParam("nid") String nid) throws Exception {return iPv6AddrService.queryAddress(nid);}
+    public ResponseEntity<?> queryAddress(@RequestParam("nid") String nid) throws Exception {return iPv6AddrService.queryAddress(nid);}
 
     // 地址溯源
     @GetMapping(value = "/address")
-    public ResponseEntity<TraceAddressResponse> traceAddress(@RequestParam("queryAddress") String queryAddress) throws Exception {return iPv6AddrService.traceAddress(queryAddress);}
+    public ResponseEntity<?> traceAddress(@RequestParam("queryAddress") String queryAddress) throws Exception {return iPv6AddrService.traceAddress(queryAddress);}
 
     // 地址删除
     @DeleteMapping(value = "/address")
-    public ResponseEntity<Response> deleteAddress(@RequestParam("deleteAddress") String address) throws Exception {return iPv6AddrService.deleteAddress(address);}
+    public ResponseEntity<?> deleteAddress(@RequestParam("deleteAddress") String address) throws Exception {return iPv6AddrService.deleteAddress(address);}
 }

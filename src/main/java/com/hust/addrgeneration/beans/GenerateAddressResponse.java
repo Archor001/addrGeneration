@@ -11,13 +11,6 @@ public class GenerateAddressResponse extends Response{
         super(code, msg);
         this.address = address;
     }
-
     public String getAddress() { return address;}
     public void setAddress(String address) {this.address=address;}
-
-    public ResponseEntity<GenerateAddressResponse> responseError(int code){
-        this.setCode(code);
-        this.setMsg(ErrorUtils.message(code));
-        return new ResponseEntity<>(this, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }

@@ -36,7 +36,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     // 批量地址查询
     @Override
-    public ResponseEntity<AddressManageResponse> filterAddress(int offset, int limit, String content) throws Exception {
+    public ResponseEntity<?> filterAddress(int offset, int limit, String content) throws Exception {
         AddressManageResponse response = new AddressManageResponse();
 
         List<Address> addressList = new ArrayList<>();
@@ -62,7 +62,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     // 地址生成
     @Override
-    public ResponseEntity<GenerateAddressResponse> generateAddress(GenerateAddress generateAddress) throws Exception {
+    public ResponseEntity<?> generateAddress(GenerateAddress generateAddress) throws Exception {
         GenerateAddressResponse response = new GenerateAddressResponse();
 
         String nid = generateAddress.getNid();
@@ -134,7 +134,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     // 地址查询
     @Override
-    public ResponseEntity<QueryAddressResponse> queryAddress(String nid) throws Exception {
+    public ResponseEntity<?> queryAddress(String nid) throws Exception {
         QueryAddressResponse response = new QueryAddressResponse();
 
         List<Address> address;
@@ -166,7 +166,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     // 地址溯源
     @Override
-    public ResponseEntity<TraceAddressResponse> traceAddress(String queryAddress) throws Exception {
+    public ResponseEntity<?> traceAddress(String queryAddress) throws Exception {
         TraceAddressResponse response = new TraceAddressResponse();
 
         // step1. use prefix of the IPv6-address and calculate time-Hash to get key
@@ -231,7 +231,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     // 地址删除
     @Override
-    public ResponseEntity<Response> deleteAddress(String address) throws Exception {
+    public ResponseEntity<?> deleteAddress(String address) throws Exception {
         Response response = new Response();
 
         int pos = getIndexOf(address, ":", 4);
@@ -242,7 +242,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         try{
             userMapper.deleteAID(AID);
         } catch (Exception e){
-            return response.responseNormalError(10016);
+            return response.responseError(10016);
         }
 
         response.setCode(0);

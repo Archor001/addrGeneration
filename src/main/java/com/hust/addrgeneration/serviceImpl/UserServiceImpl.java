@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<UserResponse> Login(User userInfo) {
+    public ResponseEntity<?> Login(User userInfo) {
         UserResponse response = new UserResponse();
         String username = userInfo.getUsername();
         String password = userInfo.getPassword();
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<UserManageResponse> FilterUsers(int offset, int limit, String content) {
+    public ResponseEntity<?> FilterUsers(int offset, int limit, String content) {
         UserManageResponse response = new UserManageResponse();
 
         List<User> userList;
@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
 
     // 创建用户
     @Override
-    public ResponseEntity<UserResponse> createUser(User infoBean) throws Exception {
+    public ResponseEntity<?> createUser(User infoBean) throws Exception {
         UserResponse response = new UserResponse();
         String name = infoBean.getName();
         String password = infoBean.getPassword();
@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
 
     // 删除用户
     @Override
-    public ResponseEntity<Response> deleteUser(String userContent) throws  Exception {
+    public ResponseEntity<?> deleteUser(String userContent) throws  Exception {
         Response response = new Response();
         if(userContent.contains(",")){  // 批量
             String[] users = userContent.split(",");
@@ -138,14 +138,14 @@ public class UserServiceImpl implements UserService {
                 try {
                     userMapper.deleteUser(user);
                 } catch (Exception e){
-                    return response.responseNormalError(10004);
+                    return response.responseError(10004);
                 }
             }
         } else {
             try {
                 userMapper.deleteUser(userContent);
             } catch (Exception e){
-                return response.responseNormalError(10004);
+                return response.responseError(10004);
             }
         }
         response.setMsg("success");
@@ -155,7 +155,7 @@ public class UserServiceImpl implements UserService {
 
     // 修改用户
     @Override
-    public ResponseEntity<UserResponse> updateUser(User infoBean) throws  Exception {
+    public ResponseEntity<?> updateUser(User infoBean) throws  Exception {
         UserResponse response = new UserResponse();
 
         // Step1. 检查nid是否存在
