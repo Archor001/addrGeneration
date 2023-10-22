@@ -347,6 +347,11 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     @Override
     public ResponseEntity<ISPResponse> getISP() throws Exception{
         ISPResponse response = new ISPResponse();
+        String isp = ispPrefix.getIsp();
+        int length = ispPrefix.getLength();
+        if(isp==null||isp.isEmpty()||length == 0){
+            return response.responseError(10018);
+        }
         response.setIsp(ispPrefix.getIsp());
         response.setLength(ispPrefix.getLength());
         response.setCode(0);
