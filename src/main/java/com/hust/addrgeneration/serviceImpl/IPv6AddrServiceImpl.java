@@ -37,7 +37,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         String userID = user.getUserID();
         String password = user.getPassword();
         String phoneNumber = user.getPhoneNumber();
-        String userName = user.getUsername();
+        String username = user.getUsername();
 
         // 第一步：判断平台是否创建了ISP前缀
         try {
@@ -59,7 +59,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         }
 
         // step1. Calculate nid with user's information
-        String encryptStr = userID + phoneNumber + userName;
+        String encryptStr = userID + phoneNumber + username;
         String hashStr = HashUtils.SM3Hash(encryptStr);
         String userPart = ConvertUtils.hexStringToBinString(hashStr).substring(0,38);
         String userType = userID.substring(0,1);
@@ -84,7 +84,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         String nid = ConvertUtils.binStringToHexString(userPart + organizationPart);
         user.setNid(nid);
         try{
-            userMapper.register(nid,password,userID,phoneNumber, userName);
+            userMapper.register(nid,password,userID,phoneNumber, username);
         } catch (Exception e) {
             return response.responseError(10002);
         }
