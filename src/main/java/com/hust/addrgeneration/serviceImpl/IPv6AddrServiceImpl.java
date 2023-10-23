@@ -126,8 +126,13 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         }
 
         // step0. check if address is applied
-        if(userMapper.queryAIDTruncAddress(phoneNumber) != null){
-            return response.responseError(10011);
+        try{
+            List<Address> addressList = userMapper.queryAIDTruncAddress(phoneNumber);
+            if(addressList.size() > 0){
+                return response.responseError(10011);
+            }
+        } catch (Exception e){
+            return response.responseError(10003);
         }
 
         // step1. check nid and password
@@ -191,7 +196,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         prefix64.deleteCharAt(prefix64.length() - 1);
         String generateAddr = String.valueOf(prefix64);
         try{
-            userMapper.updateAIDTrunc(generateAddr.replace(":",""), visibleAID, hiddenAID, timeDifference, nid, currentTime, prefix);
+            userMapper.updateAIDTrunc(generateAddr.replace(":",""), visibleAID, hiddenAID, timeDifference, phoneNumber, currentTime, prefix);
         } catch (Exception e){
             return response.responseError(10003);
         }

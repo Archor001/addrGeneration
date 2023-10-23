@@ -36,8 +36,8 @@
     </select>
 
     <insert id="updateAIDTrunc">
-        insert into aid_trunc (address, visibleAID, hiddenAID, timeDifference, nid, registerTime, prefix)
-        values (#{address}, #{visibleAID}, #{hiddenAID}, #{timeDifference}, #{nid}, #{registerTime}, #{prefix})
+        insert into aid_trunc (address, visibleAID, hiddenAID, timeDifference, phoneNumber, registerTime, prefix)
+        values (#{address}, #{visibleAID}, #{hiddenAID}, #{timeDifference}, #{phoneNumber}, #{registerTime}, #{prefix})
     </insert>
 
     <delete id="truncateAIDTrunc">
