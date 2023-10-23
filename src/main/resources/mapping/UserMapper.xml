@@ -24,11 +24,11 @@
 
     <insert id="updateAID" parameterType="String">
         insert into aid_info (aidnth, aid, prefix)
-        values (#{AIDnTH}, #{AID}, #{prefix})
+        values (#{aidnth}, #{aid}, #{prefix})
     </insert>
 
     <select id="queryAIDnTH" parameterType="String" resultType="String">
-        select aidnth from aid_info where aid = #{AID}
+        select aidnth from aid_info where aid = #{aid}
     </select>
 
     <select id="queryPrefix" parameterType="String" resultType="String">
