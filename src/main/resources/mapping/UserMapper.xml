@@ -67,12 +67,12 @@
 
 
     <select id="getUsersByFilter" resultType="com.hust.addrgeneration.beans.User">
-        select register.* , aid_trunc.address, aid_trunc.registerTime, aid_trunc.prefix from register left join aid_trunc on register.nid = aid_trunc.nid
+        select register.* , aid_trunc.address, aid_trunc.registerTime, aid_trunc.prefix from register left join aid_trunc on register.phoneNumber = aid_trunc.phoneNumber
         where register.username LIKE CONCAT('%',#{content},'%') OR register.userID LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="getUserCountByFilter" parameterType="String" resultType="int">
-        select COUNT(*) from register left join aid_trunc on register.nid = aid_trunc.nid
+        select COUNT(*) from register left join aid_trunc on register.phoneNumber = aid_trunc.phoneNumber
         where register.username LIKE CONCAT('%',#{content},'%') OR register.userID LIKE CONCAT('%',#{content},'%')
     </select>
 </mapper>
