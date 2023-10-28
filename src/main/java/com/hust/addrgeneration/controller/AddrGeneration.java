@@ -85,4 +85,10 @@ public class AddrGeneration {
     public ResponseEntity<Response> regenerateAddress() throws Exception {
         return iPv6AddrService.regenAddress();
     }
+
+    // 获取系统配置
+    @GetMapping(value = "/admin/system")
+    public ResponseEntity<?> getSystemConfig() throws Exception {
+        return iPv6AddrService.getConfig();
+    }
 }

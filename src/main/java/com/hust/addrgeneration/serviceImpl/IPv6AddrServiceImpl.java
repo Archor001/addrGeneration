@@ -399,4 +399,14 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         response.setMsg("success");
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    // 获取系统配置
+    @Override
+    public ResponseEntity<?> getConfig() throws Exception {
+        Response response = new Response();
+
+        response.setCode(0);
+        response.setMsg("success");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

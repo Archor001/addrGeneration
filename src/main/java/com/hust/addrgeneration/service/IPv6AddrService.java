@@ -11,4 +11,5 @@ public interface IPv6AddrService {
     ResponseEntity<Response> updateISP(ISP isp) throws Exception;
     ResponseEntity<ISPResponse> getISP() throws Exception;
     ResponseEntity<Response> regenAddress() throws Exception;
+    ResponseEntity<?> getConfig() throws Exception;
 }
