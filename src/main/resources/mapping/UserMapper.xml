@@ -2,24 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.hust.addrgeneration.dao.UserMapper">
     <insert id="register" parameterType="String">
-        insert into register (nid, userID, phoneNumber, password, username)
+        insert into user (nid, userID, phoneNumber, password, username)
         values (#{nid}, #{userID}, #{phoneNumber}, #{password}, #{username})
     </insert>
 
     <select id="queryRegisterInfo" parameterType="String" resultType="com.hust.addrgeneration.beans.User">
-        select userID, phoneNumber, password, username from register where nid = #{nid}
+        select userID, phoneNumber, password, username from user where nid = #{nid}
     </select>
 
     <select id="queryPhoneNumber" parameterType="String" resultType="com.hust.addrgeneration.beans.User">
-        select * from register where phoneNumber = #{phoneNumber}
+        select * from user where phoneNumber = #{phoneNumber}
     </select>
 
     <delete id="deleteUser" parameterType="String">
-        delete from register where nid = #{nid}
+        delete from user where nid = #{nid}
     </delete>
 
     <select id="getAllRegisteredUsers" resultType="com.hust.addrgeneration.beans.User">
-        select * from register
+        select * from user
     </select>
 
     <insert id="updateAID" parameterType="String">
@@ -67,12 +67,12 @@
 
 
     <select id="getUsersByFilter" resultType="com.hust.addrgeneration.beans.User">
-        select register.* , aid_trunc.address, aid_trunc.registerTime, aid_trunc.prefix from register left join aid_trunc on register.phoneNumber = aid_trunc.phoneNumber
-        where register.username LIKE CONCAT('%',#{content},'%') OR register.userID LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
+        select user.* , aid_trunc.address, aid_trunc.registerTime, aid_trunc.prefix from user left join aid_trunc on user.phoneNumber = aid_trunc.phoneNumber
+        where user.username LIKE CONCAT('%',#{content},'%') OR user.userID LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="getUserCountByFilter" parameterType="String" resultType="int">
-        select COUNT(*) from register left join aid_trunc on register.phoneNumber = aid_trunc.phoneNumber
-        where register.username LIKE CONCAT('%',#{content},'%') OR register.userID LIKE CONCAT('%',#{content},'%')
+        select COUNT(*) from user left join aid_trunc on user.phoneNumber = aid_trunc.phoneNumber
+        where user.username LIKE CONCAT('%',#{content},'%') OR user.userID LIKE CONCAT('%',#{content},'%')
     </select>
 </mapper>
