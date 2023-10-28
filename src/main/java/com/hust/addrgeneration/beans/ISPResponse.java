@@ -25,9 +25,4 @@ public class ISPResponse extends Response{
     public int getLength(){
         return this.length;
     }
-    public ResponseEntity<ISPResponse> responseError(int code){
-        this.setCode(code);
-        this.setMsg(ErrorUtils.message(code));
-        return new ResponseEntity<>(this, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }

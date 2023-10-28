@@ -13,9 +13,4 @@ public class TraceAddressResponse extends Response {
     }
     public User getUser() {return user;}
     public void setUser(User user) {this.user = user;}
-    public ResponseEntity<TraceAddressResponse> responseError(int code){
-        this.setCode(code);
-        this.setMsg(ErrorUtils.message(code));
-        return new ResponseEntity<>(this, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }

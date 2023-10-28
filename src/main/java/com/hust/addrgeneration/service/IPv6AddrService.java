@@ -4,12 +4,12 @@ import com.hust.addrgeneration.beans.*;
 import org.springframework.http.ResponseEntity;
 
 public interface IPv6AddrService {
-    ResponseEntity<GenerateAddressResponse> register(User infoBean) throws Exception;
-    ResponseEntity<GenerateAddressResponse> createAddr(GenerateAddress address) throws Exception;
-    ResponseEntity<TraceAddressResponse> traceAddr(String queryAddress) throws Exception;
-    ResponseEntity<QueryAddressResponse> queryAddr(String phoneNumber) throws Exception;
-    ResponseEntity<Response> updateISP(ISP isp) throws Exception;
-    ResponseEntity<ISPResponse> getISP() throws Exception;
-    ResponseEntity<Response> regenAddress() throws Exception;
+    ResponseEntity<?> register(User infoBean) throws Exception;
+    ResponseEntity<?> createAddr(GenerateAddress address) throws Exception;
+    ResponseEntity<?> traceAddr(String queryAddress) throws Exception;
+    ResponseEntity<?> queryAddr(String phoneNumber) throws Exception;
+    ResponseEntity<?> updateISP(ISP isp) throws Exception;
+    ResponseEntity<?> getISP() throws Exception;
+    ResponseEntity<?> regenAddress() throws Exception;
     ResponseEntity<?> getConfig() throws Exception;
 }

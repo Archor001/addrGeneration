@@ -15,12 +15,5 @@ public class QueryAddressResponse extends Response{
     }
 
     public String[] getAddress() { return address; }
-
     public void setAddress(String[] address) { this.address = address; }
-
-    public ResponseEntity<QueryAddressResponse> responseError(int code){
-        this.setCode(code);
-        this.setMsg(ErrorUtils.message(code));
-        return new ResponseEntity<>(this, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }

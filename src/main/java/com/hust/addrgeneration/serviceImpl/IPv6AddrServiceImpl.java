@@ -30,7 +30,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     // 创建用户(注册NID+地址生成)
     @Override
-    public ResponseEntity<GenerateAddressResponse> register(User infoBean) {
+    public ResponseEntity<?> register(User infoBean) {
         GenerateAddressResponse response = new GenerateAddressResponse();
 
         User user = infoBean;
@@ -101,7 +101,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     // 地址生成
     @Override
-    public ResponseEntity<GenerateAddressResponse> createAddr(GenerateAddress addressInfo) throws Exception {
+    public ResponseEntity<?> createAddr(GenerateAddress addressInfo) throws Exception {
         GenerateAddressResponse response = new GenerateAddressResponse();
 
         String phoneNumber = addressInfo.getPhoneNumber();
@@ -214,7 +214,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     }
 
     // 地址查询
-    public ResponseEntity<QueryAddressResponse> queryAddr(String phoneNumber) throws Exception {
+    public ResponseEntity<?> queryAddr(String phoneNumber) throws Exception {
         QueryAddressResponse response = new QueryAddressResponse();
 
         List<String> rntAddressList = new ArrayList<>();
@@ -260,7 +260,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     // 地址溯源
     @Override
-    public ResponseEntity<TraceAddressResponse> traceAddr(String queryAddress) throws Exception {
+    public ResponseEntity<?> traceAddr(String queryAddress) throws Exception {
         TraceAddressResponse response = new TraceAddressResponse();
 
         // step1. revert AID
@@ -322,7 +322,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     // 修改ISP(更新ISP+重新生成地址)
     @Override
-    public ResponseEntity<Response> updateISP(ISP isp) throws Exception{
+    public ResponseEntity<?> updateISP(ISP isp) throws Exception{
         Response response = new Response();
         String ispStr = isp.getIsp();
         int length = 0;
@@ -332,7 +332,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
                 length = Integer.parseInt(ispStr.substring(pos+3), 10);
                 ispStr = ispStr.substring(0, pos);
             } catch (Exception e) {
-                return response.responseNormalError(10019);
+                return response.responseError(10019);
             }
         } else {
             length = AddressUtils.getAddressBitLength(ispStr);
@@ -350,7 +350,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     // 获取ISP地址
     @Override
-    public ResponseEntity<ISPResponse> getISP() throws Exception{
+    public ResponseEntity<?> getISP() throws Exception{
         ISPResponse response = new ISPResponse();
         String isp = ispPrefix.getIsp();
         int length = ispPrefix.getLength();
@@ -366,14 +366,14 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     // 重新生成地址
     @Override
-    public ResponseEntity<Response> regenAddress() throws Exception {
+    public ResponseEntity<?> regenAddress() throws Exception {
         Response response = new Response();
 
         // 截断地址表
         try{
             userMapper.truncateAIDTrunc();
         } catch (Exception e){
-            return response.responseNormalError(10020);
+            return response.responseError(10020);
         }
 
         // 获取全部register表信息，逐个生成地址
@@ -381,7 +381,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         try{
             userList = userMapper.getAllRegisteredUsers();
         } catch (Exception e){
-            return response.responseNormalError(10020);
+            return response.responseError(10020);
         }
         User[] users = userList.toArray(new User[userList.size()]);
         for(User i : users){
@@ -391,7 +391,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
                 addressInfo.setPassword(i.getPassword());
                 this.createAddr(addressInfo);
             } catch (Exception e){
-                response.responseNormalError(10020);
+                response.responseError(10020);
             }
         }
 

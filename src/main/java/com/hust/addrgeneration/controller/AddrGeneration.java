@@ -21,68 +21,64 @@ public class AddrGeneration {
 
     // 登录
     @PostMapping("/login")
-    public ResponseEntity<UserResponse> login(@RequestBody User userInfo) throws Exception {
+    public ResponseEntity<?> login(@RequestBody User userInfo) throws Exception {
         return userService.Login(userInfo);
     }
 
     // 用户注册(申请NID)
     @PutMapping(value = "/admin/user")
-    public ResponseEntity<GenerateAddressResponse> register(@RequestBody User userInfo) throws Exception {
+    public ResponseEntity<?> register(@RequestBody User userInfo) throws Exception {
         return iPv6AddrService.register(userInfo);
     }
 
     // 批量获取用户
     @GetMapping(value="/admin/user")
-    public ResponseEntity<UserManageResponse> manageUser(
+    public ResponseEntity<?> manageUser(
             @RequestParam("offset") int offset,
             @RequestParam("limit") int limit,
             @RequestParam("content") String content) throws Exception {
-        UserManage um = new UserManage();
-        um.setOffset(offset);
-        um.setLimit(limit);
-        um.setContent(content);
-        return userService.FilterUsers(um);
+        return userService.FilterUsers(offset, limit, content);
     }
 
     // 删除用户
     @DeleteMapping(value="/admin/user")
-    public ResponseEntity<Response> deleteUser(@RequestParam("nid") String nid) throws Exception{
+    public ResponseEntity<?> deleteUser(@RequestParam("nid") String nid) throws Exception{
         return userService.DeleteUser(nid);
     }
 
     // 地址生成
     @PostMapping(value = "/admin/address")
-    public ResponseEntity<GenerateAddressResponse> createAddress(@RequestBody GenerateAddress addressInfo) throws Exception {
+    public ResponseEntity<?> createAddress(@RequestBody GenerateAddress addressInfo) throws Exception {
         return iPv6AddrService.createAddr(addressInfo);
     }
 
     // 地址查询
     @GetMapping(value = "/admin/query")
-    public ResponseEntity<QueryAddressResponse> queryAddress(@RequestParam("phoneNumber") String phoneNumber) throws Exception {
+    public ResponseEntity<?> queryAddress(@RequestParam("phoneNumber") String phoneNumber) throws Exception {
         return iPv6AddrService.queryAddr(phoneNumber);
     }
 
     // 地址溯源
     @GetMapping(value = "/admin/address")
-    public ResponseEntity<TraceAddressResponse> traceAddress(@RequestParam("queryAddress") String queryAddress) throws Exception {
+    public ResponseEntity<?> traceAddress(@RequestParam("queryAddress") String queryAddress) throws Exception {
         return iPv6AddrService.traceAddr(queryAddress);
     }
 
     // 修改ISP地址前缀（自动重新生成地址）
     @PostMapping(value = "/admin/isp")
-    public ResponseEntity<Response> updateISP(@RequestBody ISP isp) throws Exception {
+    public ResponseEntity<?> updateISP(@RequestBody ISP isp) throws Exception {
         return iPv6AddrService.updateISP(isp);
     }
 
     // 获取ISP地址前缀
     @GetMapping(value="/admin/isp")
-    public ResponseEntity<ISPResponse> getISP() throws Exception {
+    public ResponseEntity<?> getISP() throws Exception {
         return iPv6AddrService.getISP();
     }
 
     // 手动重新生成地址
     @PostMapping(value = "/admin/regen/address")
-    public ResponseEntity<Response> regenerateAddress() throws Exception {
+    public ResponseEntity<?> regenerateAddress() throws Exception {
         return iPv6AddrService.regenAddress();
     }
 

@@ -32,7 +32,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<UserResponse> Login(User userInfo) {
+    public ResponseEntity<?> Login(User userInfo) {
         UserResponse response = new UserResponse();
         String username = userInfo.getUsername();
         String password = userInfo.getPassword();
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<UserManageResponse> FilterUsers(UserManage um) {
+    public ResponseEntity<?> FilterUsers(int offset, int limit, String content) {
         UserManageResponse response = new UserManageResponse();
 
         if(ispPrefix.getIsp() == null || ispPrefix.getIsp().length() == 0){
@@ -54,9 +54,6 @@ public class UserServiceImpl implements UserService {
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
-        int offset = um.getOffset();
-        int limit = um.getLimit();
-        String content = um.getContent();
         List<User> userList = new ArrayList<User>();
 
         try{
@@ -92,16 +89,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<Response> DeleteUser(String nid){
+    public ResponseEntity<?> DeleteUser(String nid){
         Response response = new Response();
         User user = userMapper.queryRegisterInfo(nid);
         if(user == null){
-            return response.responseNormalError(10014);
+            return response.responseError(10014);
         }
         try{
             userMapper.deleteUser(nid);
         } catch(Exception e) {
-            return response.responseNormalError(10013);
+            return response.responseError(10013);
         }
         response.setCode(0);
         response.setMsg("success");
