@@ -8,7 +8,7 @@ server:
 spring:
   datasource:
     username: root
-    url: jdbc:mysql://localhost:3306/addr5g
+    url: jdbc:mysql://218.199.84.72:3306/addr5g?allowMultiQueries=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     password: 132311
 

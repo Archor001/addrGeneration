@@ -10,8 +10,10 @@ public class User {
     private String username;
     private String nid;
     private String address;
+    private int status;
     private long registerTime;
     private String prefix;
+    private int addrStatus;
 
     public String getNid() {
         return nid;
@@ -67,5 +69,21 @@ public class User {
     }
     public void setPrefix(String prefix) {
         this.prefix = prefix;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getAddrStatus() {
+        return addrStatus;
+    }
+
+    public void setAddrStatus(int addrStatus) {
+        this.addrStatus = addrStatus;
     }
 }

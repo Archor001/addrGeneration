@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface UserMapper {
     // user表
-    void register(String nid, String password, String userID, String phoneNumber, String username);      // register表，注册用户(申请NID)
+    void register(String nid, String password, String userID, String phoneNumber, String username, int status);      // register表，注册用户(申请NID)
     User queryRegisterInfo(String nid);    // register表，获取nid对应的username、userID、password、phoneNumber
     User queryPhoneNumber(String phoneNumber);        // 查找phoneNumber对应的user
     void deleteUser(String phoneNumber);           // 删除nid对应的用户
@@ -22,7 +22,7 @@ public interface UserMapper {
 
 
     // aid_trunc表
-    void updateAIDTrunc(String address, String visibleAID, String hiddenAID, int timeDifference, String phoneNumber, long registerTime, String prefix);    // aid_trunc表，新增
+    void updateAIDTrunc(String address, String visibleAID, String hiddenAID, int timeDifference, String phoneNumber, long registerTime, String prefix, int status);    // aid_trunc表，新增
     String queryAIDTruncHiddenAID(String visibleAID, int timeDifference);  // aid_trunc表，获取visibleAID、timeDifference对应的hiddenAID
     int queryAIDTruncTime(String address);       // aid_trunc表，获取address对应的timeDifference
     List<Address> queryAIDTruncAddress(String phoneNumber);       // 查询phoneNumber对应的address

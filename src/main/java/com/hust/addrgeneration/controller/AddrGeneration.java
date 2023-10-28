@@ -42,8 +42,8 @@ public class AddrGeneration {
 
     // 删除用户
     @DeleteMapping(value="/admin/user")
-    public ResponseEntity<?> deleteUser(@RequestParam("nid") String nid) throws Exception{
-        return userService.DeleteUser(nid);
+    public ResponseEntity<?> deleteUser(@RequestParam("phoneNumber") String phoneNumber) throws Exception{
+        return userService.DeleteUser(phoneNumber);
     }
 
     // 地址生成

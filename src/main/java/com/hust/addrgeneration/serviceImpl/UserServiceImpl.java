@@ -89,14 +89,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ResponseEntity<?> DeleteUser(String nid){
+    public ResponseEntity<?> DeleteUser(String phoneNumber){
         Response response = new Response();
-        User user = userMapper.queryRegisterInfo(nid);
+        User user = userMapper.queryPhoneNumber(phoneNumber);
         if(user == null){
             return response.responseError(10014);
         }
         try{
-            userMapper.deleteUser(nid);
+            userMapper.deleteUser(phoneNumber);
         } catch(Exception e) {
             return response.responseError(10013);
         }

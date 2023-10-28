@@ -84,7 +84,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         String nid = ConvertUtils.binStringToHexString(userPart + organizationPart);
         user.setNid(nid);
         try{
-            userMapper.register(nid,password,userID,phoneNumber, username);
+            userMapper.register(nid,password,userID,phoneNumber, username, 1);
         } catch (Exception e) {
             return response.responseError(10002);
         }
@@ -196,7 +196,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         prefix64.deleteCharAt(prefix64.length() - 1);
         String generateAddr = String.valueOf(prefix64);
         try{
-            userMapper.updateAIDTrunc(generateAddr.replace(":",""), visibleAID, hiddenAID, timeDifference, phoneNumber, currentTime, prefix);
+            userMapper.updateAIDTrunc(generateAddr.replace(":",""), visibleAID, hiddenAID, timeDifference, phoneNumber, currentTime, prefix, 1);
         } catch (Exception e){
             return response.responseError(10003);
         }

@@ -2,8 +2,8 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.hust.addrgeneration.dao.UserMapper">
     <insert id="register" parameterType="String">
-        insert into user (nid, userID, phoneNumber, password, username)
-        values (#{nid}, #{userID}, #{phoneNumber}, #{password}, #{username})
+        insert into user (nid, userID, phoneNumber, password, username, status)
+        values (#{nid}, #{userID}, #{phoneNumber}, #{password}, #{username}, #{status})
     </insert>
 
     <select id="queryRegisterInfo" parameterType="String" resultType="com.hust.addrgeneration.beans.User">
@@ -14,9 +14,10 @@
         select * from user where phoneNumber = #{phoneNumber}
     </select>
 
-    <delete id="deleteUser" parameterType="String">
-        delete from user where nid = #{nid}
-    </delete>
+    <update id="deleteUser" parameterType="String">
+        update user <set>status = 3</set> where phoneNumber = #{phoneNumber};
+        update aid_trunc <set>status = 3</set> where phoneNumber = #{phoneNumber};
+    </update>
 
     <select id="getAllRegisteredUsers" resultType="com.hust.addrgeneration.beans.User">
         select * from user
@@ -36,8 +37,8 @@
     </select>
 
     <insert id="updateAIDTrunc">
-        insert into aid_trunc (address, visibleAID, hiddenAID, timeDifference, phoneNumber, registerTime, prefix)
-        values (#{address}, #{visibleAID}, #{hiddenAID}, #{timeDifference}, #{phoneNumber}, #{registerTime}, #{prefix})
+        insert into aid_trunc (address, visibleAID, hiddenAID, timeDifference, phoneNumber, registerTime, prefix, status)
+        values (#{address}, #{visibleAID}, #{hiddenAID}, #{timeDifference}, #{phoneNumber}, #{registerTime}, #{prefix}, #{status})
     </insert>
 
     <delete id="truncateAIDTrunc">
@@ -67,7 +68,7 @@
 
 
     <select id="getUsersByFilter" resultType="com.hust.addrgeneration.beans.User">
-        select user.* , aid_trunc.address, aid_trunc.registerTime, aid_trunc.prefix from user left join aid_trunc on user.phoneNumber = aid_trunc.phoneNumber
+        select user.* , aid_trunc.address, aid_trunc.registerTime, aid_trunc.prefix, aid_trunc.status as addrStatus from user left join aid_trunc on user.phoneNumber = aid_trunc.phoneNumber
         where user.username LIKE CONCAT('%',#{content},'%') OR user.userID LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
     </select>
 
