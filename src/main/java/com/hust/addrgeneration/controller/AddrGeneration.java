@@ -87,4 +87,10 @@ public class AddrGeneration {
     public ResponseEntity<?> getSystemConfig() throws Exception {
         return iPv6AddrService.getConfig();
     }
+
+    // 修改用户同步时间
+    @PostMapping(value = "/admin/system")
+    public ResponseEntity<?> setGap(@RequestBody float syncGap) throws Exception {
+        return iPv6AddrService.setSyncGap(syncGap);
+    }
 }

@@ -1,6 +1,5 @@
 package com.hust.addrgeneration.serviceImpl;
 
-import com.alibaba.fastjson.JSONObject;
 import com.hust.addrgeneration.beans.*;
 import com.hust.addrgeneration.dao.UserMapper;
 import com.hust.addrgeneration.service.IPv6AddrService;
@@ -22,6 +21,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     private final UserMapper userMapper;
     private static final Logger logger = LoggerFactory.getLogger(IPv6AddrServiceImpl.class);
     private ISP ispPrefix = ISPUtils.ispPrefix;
+    private float syncGap = 24;
 
     @Autowired
     public IPv6AddrServiceImpl(UserMapper userMapper) {
@@ -403,8 +403,25 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     // 获取系统配置
     @Override
     public ResponseEntity<?> getConfig() throws Exception {
-        Response response = new Response();
+        SystemResponse response = new SystemResponse();
 
+        String isp = ispPrefix.getIsp();
+        int length = ispPrefix.getLength();
+        if(isp==null||isp.isEmpty()||length == 0){
+            return response.responseError(10018);
+        }
+
+        response.setIsp(ispPrefix);
+        response.setSyncGap(syncGap);
+        response.setCode(0);
+        response.setMsg("success");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<?> setSyncGap(float gap) throws Exception {
+        Response response = new Response();
+        syncGap = gap;
         response.setCode(0);
         response.setMsg("success");
         return new ResponseEntity<>(response, HttpStatus.OK);

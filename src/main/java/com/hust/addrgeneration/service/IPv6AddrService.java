@@ -12,4 +12,5 @@ public interface IPv6AddrService {
     ResponseEntity<?> getISP() throws Exception;
     ResponseEntity<?> regenAddress() throws Exception;
     ResponseEntity<?> getConfig() throws Exception;
+    ResponseEntity<?> setSyncGap(float gap) throws Exception;
 }
