@@ -57,37 +57,38 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             return response.responseError(10015);
         }
 
-        if(checkUser != null && checkUser.getStatus() == 3){    // 如果用户是删除态，恢复其状态，不同重新生成nid
+        String encryptStr = userID + phoneNumber + username;
+        String hashStr = HashUtils.SM3Hash(encryptStr);
+        String userPart = ConvertUtils.hexStringToBinString(hashStr).substring(0,38);
+        String userType = userID.substring(0,1);
+        String organizationPart = "";
+        switch (userType) {
+            case "U" :
+                organizationPart = "00";
+                break;
+
+            case "M" :
+                organizationPart = "01";
+                break;
+
+            case "D" :
+                organizationPart = "10";
+                break;
+            default:
+                organizationPart = "11";
+                break;
+        }
+
+        String nid = ConvertUtils.binStringToHexString(userPart + organizationPart);
+        infoBean.setNid(nid);
+
+        if(checkUser != null && checkUser.getStatus() == 3){    // 注册的是之前删除过的手机号
             try{
-                userMapper.updateUserStatus(phoneNumber);
-            } catch (Exception e) {
+                userMapper.updateUser(nid, password, userID, phoneNumber, username, 1);
+            } catch (Exception e){
                 return response.responseError(10002);
             }
-        } else {     // 否则生成NID，入库
-            String encryptStr = userID + phoneNumber + username;
-            String hashStr = HashUtils.SM3Hash(encryptStr);
-            String userPart = ConvertUtils.hexStringToBinString(hashStr).substring(0,38);
-            String userType = userID.substring(0,1);
-            String organizationPart = "";
-            switch (userType) {
-                case "U" :
-                    organizationPart = "00";
-                    break;
-
-                case "M" :
-                    organizationPart = "01";
-                    break;
-
-                case "D" :
-                    organizationPart = "10";
-                    break;
-                default:
-                    organizationPart = "11";
-                    break;
-            }
-
-            String nid = ConvertUtils.binStringToHexString(userPart + organizationPart);
-            infoBean.setNid(nid);
+        } else {        // 注册的是新用户
             try{
                 userMapper.register(nid,password,userID,phoneNumber, username, 1);
             } catch (Exception e) {

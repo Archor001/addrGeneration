@@ -14,6 +14,10 @@
         select * from user where phoneNumber = #{phoneNumber}
     </select>
 
+    <update id="updateUser">
+        update user <set>nid = #{nid}, password = #{password}, userID = #{userID}, username = #{username}, status = #{status}</set> where phoneNumber = #{phoneNumber};
+    </update>
+
     <update id="deleteUser" parameterType="String">
         update user <set>status = 3</set> where phoneNumber = #{phoneNumber};
         update aid_trunc <set>status = 3</set> where phoneNumber = #{phoneNumber};
@@ -75,7 +79,7 @@
     </select>
 
     <select id="getAddressesByFilter" resultType="com.hust.addrgeneration.beans.Address">
-        select user.username, user.phoneNumber, user.nid, user.status, aid_trunc.address, aid_trunc.registerTime from user left join aid_trunc on user.phoneNumber = aid_trunc.phoneNumber
+        select user.username, user.phoneNumber, user.nid, aid_trunc.status, aid_trunc.address, aid_trunc.registerTime from user left join aid_trunc on user.phoneNumber = aid_trunc.phoneNumber
         where user.username LIKE CONCAT('%',#{content},'%') OR user.phoneNumber LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
     </select>
 

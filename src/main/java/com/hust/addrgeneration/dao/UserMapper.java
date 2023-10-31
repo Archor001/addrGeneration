@@ -12,8 +12,8 @@ public interface UserMapper {
     void register(String nid, String password, String userID, String phoneNumber, String username, int status);      // register表，注册用户(申请NID)
     User queryRegisterInfo(String nid);    // register表，获取nid对应的username、userID、password、phoneNumber
     User queryPhoneNumber(String phoneNumber);        // 查找phoneNumber对应的user
-    void updateUserStatus(String phoneNumber);      // 修改phoneNumber对应用户的status为3
-    void deleteUser(String phoneNumber);           // 删除nid对应的用户
+    void updateUser(String nid, String password, String userID, String phoneNumber, String username, int status);    // 修改用户
+    void deleteUser(String phoneNumber);           // 标记删除phoneNumber对应的用户,标记status=3
     List<User> getAllRegisteredUsers();     // 获取全部用户
 
     // aid_info表
