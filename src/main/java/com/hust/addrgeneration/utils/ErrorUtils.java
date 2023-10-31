@@ -9,45 +9,45 @@ public class ErrorUtils {
     public static String message(int code) {
         switch (code) {
             case 10001:
-                return "Need Login";
+                return "需要登录";
             case 10002:
-                return "Register Failed";
+                return "注册用户失败";
             case 10003:
-                return "Address Generation Failed";
+                return "地址生成失败";
             case 10004:
-                return "PhoneNumber has not been registered";
+                return "手机号已被注册";
             case 10005:
-                return "Wrong password";
+                return "密码错误";
             case 10006:
-                return "Please register NID";
+                return "请注册此NID";
             case 10007:
-                return "Failed to get key-set. Key-set empty";
+                return "获取密钥集失败！密钥集为空";
             case 10008:
-                return "Decryption Failed";
+                return "解密失败";
             case 10009:
-                return "Encryption Failed";
+                return "加密失败";
             case 10010:
-                return "Failed to get user";
+                return "获取用户失败";
             case 10011:
-                return "current phoneNumber has already applied address";
+                return "此手机号已经创建了IPv6地址";
             case 10012:
-                return "invalid phoneNumber";
+                return "无效手机号码";
             case 10013:
-                return "Failed to delete user";
+                return "删除用户失败";
             case 10014:
-                return "This NID corresponds to non-exist user";
+                return "此NID对应不存在的用户";
             case 10015:
-                return "phoneNumber has been registered already";
+                return "手机号已经被注册";
             case 10016:
-                return "QueryAddress doesn't exist";
+                return "查询的IPv6地址不存在";
             case 10017:
-                return "PhoneNumber has not registered NID yet";
+                return "此手机号还未生成NID";
             case 10018:
-                return "Please create ISP-prefix in the platform first";
+                return "请在平台事先创建好ISP地址聚合前缀";
             case 10019:
-                return "ISP address prefix format is invalid";
+                return "ISP地址聚合前缀格式无效";
             case 10020:
-                return "regenerate address failed";
+                return "重新生成地址失败";
             case 10021:
                 return "批量获取地址失败";
             default:
