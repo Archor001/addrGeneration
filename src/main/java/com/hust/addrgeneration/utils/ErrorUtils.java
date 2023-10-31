@@ -48,6 +48,8 @@ public class ErrorUtils {
                 return "ISP address prefix format is invalid";
             case 10020:
                 return "regenerate address failed";
+            case 10021:
+                return "批量获取地址失败";
             default:
                 return "Unknown";
         }

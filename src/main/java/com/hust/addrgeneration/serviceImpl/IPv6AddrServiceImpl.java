@@ -33,11 +33,10 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     public ResponseEntity<?> register(User infoBean) {
         GenerateAddressResponse response = new GenerateAddressResponse();
 
-        User user = infoBean;
-        String userID = user.getUserID();
-        String password = user.getPassword();
-        String phoneNumber = user.getPhoneNumber();
-        String username = user.getUsername();
+        String userID = infoBean.getUserID();
+        String password = infoBean.getPassword();
+        String phoneNumber = infoBean.getPhoneNumber();
+        String username = infoBean.getUsername();
 
         // 第一步：判断平台是否创建了ISP前缀
         try {
@@ -54,44 +53,52 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
         // 第三步：判断是否可以创建用户
         User checkUser = userMapper.queryPhoneNumber(phoneNumber);
-        if(checkUser != null ){
+        if(checkUser != null && checkUser.getStatus() != 3){
             return response.responseError(10015);
         }
 
-        // step1. Calculate nid with user's information
-        String encryptStr = userID + phoneNumber + username;
-        String hashStr = HashUtils.SM3Hash(encryptStr);
-        String userPart = ConvertUtils.hexStringToBinString(hashStr).substring(0,38);
-        String userType = userID.substring(0,1);
-        String organizationPart = "";
-        switch (userType) {
-            case "U" :
-                organizationPart = "00";
-                break;
+        if(checkUser != null && checkUser.getStatus() == 3){    // 如果用户是删除态，恢复其状态，不同重新生成nid
+            try{
+                userMapper.updateUserStatus(phoneNumber);
+            } catch (Exception e) {
+                return response.responseError(10002);
+            }
+        } else {     // 否则生成NID，入库
+            String encryptStr = userID + phoneNumber + username;
+            String hashStr = HashUtils.SM3Hash(encryptStr);
+            String userPart = ConvertUtils.hexStringToBinString(hashStr).substring(0,38);
+            String userType = userID.substring(0,1);
+            String organizationPart = "";
+            switch (userType) {
+                case "U" :
+                    organizationPart = "00";
+                    break;
 
-            case "M" :
-                organizationPart = "01";
-                break;
+                case "M" :
+                    organizationPart = "01";
+                    break;
 
-            case "D" :
-                organizationPart = "10";
-                break;
-            default:
-                organizationPart = "11";
-                break;
+                case "D" :
+                    organizationPart = "10";
+                    break;
+                default:
+                    organizationPart = "11";
+                    break;
+            }
+
+            String nid = ConvertUtils.binStringToHexString(userPart + organizationPart);
+            infoBean.setNid(nid);
+            try{
+                userMapper.register(nid,password,userID,phoneNumber, username, 1);
+            } catch (Exception e) {
+                return response.responseError(10002);
+            }
         }
 
-        String nid = ConvertUtils.binStringToHexString(userPart + organizationPart);
-        user.setNid(nid);
-        try{
-            userMapper.register(nid,password,userID,phoneNumber, username, 1);
-        } catch (Exception e) {
-            return response.responseError(10002);
-        }
         try{
             GenerateAddress addressInfo = new GenerateAddress();
-            addressInfo.setPhoneNumber(user.getPhoneNumber());
-            addressInfo.setPassword(user.getPassword());
+            addressInfo.setPhoneNumber(infoBean.getPhoneNumber());
+            addressInfo.setPassword(infoBean.getPassword());
             return this.createAddr(addressInfo);
         } catch (Exception e){
             return response.responseError(10003);
@@ -125,16 +132,6 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             return response.responseError(10018);
         }
 
-        // step0. check if address is applied
-        try{
-            List<Address> addressList = userMapper.queryAIDTruncAddress(phoneNumber);
-            if(addressList.size() > 0){
-                return response.responseError(10011);
-            }
-        } catch (Exception e){
-            return response.responseError(10003);
-        }
-
         // step1. check nid and password
         /*
          if the nid isn't in the database, return the information tells user to register a nid
@@ -161,7 +158,6 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         if(preAID == null || preAID.length() != 32){
             return response.responseError(10009);
         }
-        logger.info(preAID);
         String str1 = preAID.substring(0,16);
         String str2 = preAID.substring(16,32);
 
@@ -201,14 +197,19 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             return response.responseError(10003);
         }
 
-        user.setNid(nid);
-        user.setAddress(generateAddr);
-        user.setPrefix(prefix + "::/" + ispPrefix.getLength());
-        user.setRegisterTime(currentTime);
+        UserAddress userAddress = new UserAddress();
+        userAddress.setUserID(user.getUserID());
+        userAddress.setPassword(user.getPassword());
+        userAddress.setPhoneNumber(user.getPhoneNumber());
+        userAddress.setUsername(user.getUsername());
+        userAddress.setNid(user.getNid());
+        userAddress.setAddress(generateAddr);
+        userAddress.setPrefix(prefix + "::/" + ispPrefix.getLength());
+        userAddress.setRegisterTime(currentTime);
 
         response.setCode(0);
         response.setMsg("success");
-        response.setUser(user);
+        response.setUser(userAddress);
         response.setAddress(generateAddr);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
@@ -312,11 +313,42 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         long registerTime = (baseTime + timeInfo);
 
         User userInfo = userMapper.queryRegisterInfo(nid);
-        userInfo.setRegisterTime(registerTime);
+        UserAddress userAddress = new UserAddress();
+
+        userAddress.setPhoneNumber(userInfo.getPhoneNumber());
+        userAddress.setUserID(userInfo.getUserID());
+        userAddress.setUsername(userInfo.getUsername());
+        userAddress.setRegisterTime(registerTime);
 
         response.setCode(0);
         response.setMsg("success");
-        response.setUser(userInfo);
+        response.setUser(userAddress);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    // 批量获取地址
+    @Override
+    public ResponseEntity<?> filterAddress(int offset, int limit, String content) throws Exception {
+        AddressManageResponse response = new AddressManageResponse();
+
+        List<Address> addressList = new ArrayList<>();
+        try{
+            addressList = userMapper.getAddressesByFilter(offset, limit, content);
+        } catch (Exception e){
+            return response.responseError(10021);
+        }
+
+        int addressCount = 0;
+        try{
+            addressCount = userMapper.getAddressCountByFilter(content);
+        } catch (Exception e){
+            return response.responseError(10021);
+        }
+
+        response.setCode(0);
+        response.setMsg("success");
+        response.setAddresses(addressList.toArray(new Address[addressList.size()]));
+        response.setCount(addressCount);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -385,6 +417,8 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         }
         User[] users = userList.toArray(new User[userList.size()]);
         for(User i : users){
+            if(i.getStatus() == 3)
+                continue;
             try{
                 GenerateAddress addressInfo = new GenerateAddress();
                 addressInfo.setPhoneNumber(i.getPhoneNumber());

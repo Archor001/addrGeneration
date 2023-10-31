@@ -8,6 +8,7 @@ public interface IPv6AddrService {
     ResponseEntity<?> createAddr(GenerateAddress address) throws Exception;
     ResponseEntity<?> traceAddr(String queryAddress) throws Exception;
     ResponseEntity<?> queryAddr(String phoneNumber) throws Exception;
+    ResponseEntity<?> filterAddress(int offset, int limit, String content) throws Exception;
     ResponseEntity<?> updateISP(ISP isp) throws Exception;
     ResponseEntity<?> getISP() throws Exception;
     ResponseEntity<?> regenAddress() throws Exception;

@@ -66,14 +66,21 @@
         values (#{addrGenIP}, #{ideaKey}, #{timeHash})
     </insert>
 
-
     <select id="getUsersByFilter" resultType="com.hust.addrgeneration.beans.User">
-        select user.* , aid_trunc.address, aid_trunc.registerTime, aid_trunc.prefix, aid_trunc.status as addrStatus from user left join aid_trunc on user.phoneNumber = aid_trunc.phoneNumber
-        where user.username LIKE CONCAT('%',#{content},'%') OR user.userID LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
+        select * from user where username LIKE CONCAT('%',#{content},'%') OR phoneNumber LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
     </select>
 
     <select id="getUserCountByFilter" parameterType="String" resultType="int">
+        select COUNT(*) from user where username LIKE CONCAT('%',#{content},'%') OR phoneNumber LIKE CONCAT('%',#{content},'%')
+    </select>
+
+    <select id="getAddressesByFilter" resultType="com.hust.addrgeneration.beans.Address">
+        select user.username, user.phoneNumber, user.nid, user.status, aid_trunc.address, aid_trunc.registerTime from user left join aid_trunc on user.phoneNumber = aid_trunc.phoneNumber
+        where user.username LIKE CONCAT('%',#{content},'%') OR user.phoneNumber LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="getAddressCountByFilter" parameterType="String" resultType="int">
         select COUNT(*) from user left join aid_trunc on user.phoneNumber = aid_trunc.phoneNumber
-        where user.username LIKE CONCAT('%',#{content},'%') OR user.userID LIKE CONCAT('%',#{content},'%')
+        where user.username LIKE CONCAT('%',#{content},'%') OR user.phoneNumber LIKE CONCAT('%',#{content},'%')
     </select>
 </mapper>

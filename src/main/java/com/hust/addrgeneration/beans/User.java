@@ -11,9 +11,6 @@ public class User {
     private String nid;
     private String address;
     private int status;
-    private long registerTime;
-    private String prefix;
-    private int addrStatus;
 
     public String getNid() {
         return nid;
@@ -52,23 +49,13 @@ public class User {
     public void setUsername(String username) {
         this.username = username;
     }
+
     public String getAddress() {
         return address;
     }
+
     public void setAddress(String address) {
         this.address = address;
-    }
-    public long getRegisterTime() {
-        return registerTime;
-    }
-    public void setRegisterTime(long registerTime) {
-        this.registerTime = registerTime;
-    }
-    public String getPrefix() {
-        return prefix;
-    }
-    public void setPrefix(String prefix) {
-        this.prefix = prefix;
     }
 
     public int getStatus() {
@@ -79,11 +66,4 @@ public class User {
         this.status = status;
     }
 
-    public int getAddrStatus() {
-        return addrStatus;
-    }
-
-    public void setAddrStatus(int addrStatus) {
-        this.addrStatus = addrStatus;
-    }
 }

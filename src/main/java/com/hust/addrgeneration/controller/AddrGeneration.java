@@ -64,6 +64,15 @@ public class AddrGeneration {
         return iPv6AddrService.traceAddr(queryAddress);
     }
 
+    // 批量获取地址
+    @GetMapping(value = "/admin/addresses")
+    public ResponseEntity<?> filterAddress(
+            @RequestParam("offset") int offset,
+            @RequestParam("limit") int limit,
+            @RequestParam("content") String content) throws Exception {
+        return iPv6AddrService.filterAddress(offset, limit, content);
+    }
+
     // 修改ISP地址前缀（自动重新生成地址）
     @PostMapping(value = "/admin/isp")
     public ResponseEntity<?> updateISP(@RequestBody ISP isp) throws Exception {

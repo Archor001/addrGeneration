@@ -5,18 +5,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class GenerateAddressResponse extends Response{
-    private User user;
+    private UserAddress user;
     private String address;
     public GenerateAddressResponse(){};
-    public GenerateAddressResponse(int code, String msg, User user, String address) {
+    public GenerateAddressResponse(int code, String msg, UserAddress user, String address) {
         super(code, msg);
         this.user = user;
         this.address = address;
     }
 
     public String getAddress() { return address; }
-
     public void setAddress(String address) { this.address = address; }
-    public User getUser() { return user;}
-    public void setUser(User user) {this.user=user;}
+    public UserAddress getUser() { return user;}
+    public void setUser(UserAddress user) {this.user=user;}
 }
