@@ -57,34 +57,13 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             return response.responseError(10015);
         }
 
-        String encryptStr = userID + phoneNumber + username;
-        String hashStr = HashUtils.SM3Hash(encryptStr);
-        String userPart = ConvertUtils.hexStringToBinString(hashStr).substring(0,38);
-        String userType = userID.substring(0,1);
-        String organizationPart = "";
-        switch (userType) {
-            case "U" :
-                organizationPart = "00";
-                break;
-
-            case "M" :
-                organizationPart = "01";
-                break;
-
-            case "D" :
-                organizationPart = "10";
-                break;
-            default:
-                organizationPart = "11";
-                break;
-        }
-
-        String nid = ConvertUtils.binStringToHexString(userPart + organizationPart);
+        String nid = generateNID(username, phoneNumber, userID);
         infoBean.setNid(nid);
+        infoBean.setStatus(1);
 
         if(checkUser != null && checkUser.getStatus() == 3){    // 注册的是之前删除过的手机号
             try{
-                userMapper.updateUser(nid, password, userID, phoneNumber, username, 1);
+                userMapper.updateUser(infoBean);
             } catch (Exception e){
                 return response.responseError(10002);
             }
@@ -105,6 +84,44 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             return response.responseError(10003);
         }
 
+    }
+
+    // 修改用户 （重新生成NID+IPv6地址）
+    @Override
+    public ResponseEntity<?> updateUser(User user) throws Exception {
+        GenerateAddressResponse response = new GenerateAddressResponse();
+
+        String phoneNumber = user.getPhoneNumber();
+        String username = user.getUsername();
+        String password = user.getPassword();
+        String userID = user.getUserID();
+
+        String phoneRegexp = "^((13[0-9])|(14[57])|(15[0-35-9])|(16[2567])|(17[0-8])|(18[0-9])|(19[0-9]))\\d{8}$";
+        if(!Pattern.matches(phoneRegexp,phoneNumber)){
+            return response.responseError(10005);
+        }
+
+        String newNID = generateNID(username, phoneNumber, userID);
+        if(password != null) user.setPassword(password);
+        if(username != null) user.setUsername(username);
+        if(userID != null) user.setUserID(userID);
+        user.setNid(newNID);
+        user.setStatus(1);
+
+        try{
+            userMapper.updateUser(user);
+        } catch (Exception e){
+            return response.responseError(10008);
+        }
+
+        try{
+            GenerateAddress addressInfo = new GenerateAddress();
+            addressInfo.setPhoneNumber(user.getPhoneNumber());
+            addressInfo.setPassword(user.getPassword());
+            return this.createAddr(addressInfo);
+        } catch (Exception e){
+            return response.responseError(10003);
+        }
     }
 
     // 地址生成
@@ -199,10 +216,6 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         }
 
         UserAddress userAddress = new UserAddress();
-        userAddress.setUserID(user.getUserID());
-        userAddress.setPassword(user.getPassword());
-        userAddress.setPhoneNumber(user.getPhoneNumber());
-        userAddress.setUsername(user.getUsername());
         userAddress.setNid(user.getNid());
         userAddress.setAddress(generateAddr);
         userAddress.setPrefix(prefix + "::/" + ispPrefix.getLength());
@@ -211,7 +224,6 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         response.setCode(0);
         response.setMsg("success");
         response.setUser(userAddress);
-        response.setAddress(generateAddr);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -460,5 +472,31 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         response.setCode(0);
         response.setMsg("success");
         return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    private String generateNID(String username, String phoneNumber, String userID){
+        String encryptStr = userID + phoneNumber + username;
+        String hashStr = HashUtils.SM3Hash(encryptStr);
+        String userPart = ConvertUtils.hexStringToBinString(hashStr).substring(0,38);
+        String userType = userID.substring(0,1);
+        String organizationPart = "";
+        switch (userType) {
+            case "U" :
+                organizationPart = "00";
+                break;
+
+            case "M" :
+                organizationPart = "01";
+                break;
+
+            case "D" :
+                organizationPart = "10";
+                break;
+            default:
+                organizationPart = "11";
+                break;
+        }
+
+        return ConvertUtils.binStringToHexString(userPart + organizationPart);
     }
 }

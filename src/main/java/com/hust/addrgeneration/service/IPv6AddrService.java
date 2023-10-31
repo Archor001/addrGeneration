@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 
 public interface IPv6AddrService {
     ResponseEntity<?> register(User infoBean) throws Exception;
+    ResponseEntity<?> updateUser(User user) throws Exception;
     ResponseEntity<?> createAddr(GenerateAddress address) throws Exception;
     ResponseEntity<?> traceAddr(String queryAddress) throws Exception;
     ResponseEntity<?> queryAddr(String phoneNumber) throws Exception;

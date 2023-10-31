@@ -14,7 +14,7 @@
         select * from user where phoneNumber = #{phoneNumber}
     </select>
 
-    <update id="updateUser">
+    <update id="updateUser" parameterType="com.hust.addrgeneration.beans.User">
         update user <set>nid = #{nid}, password = #{password}, userID = #{userID}, username = #{username}, status = #{status}</set> where phoneNumber = #{phoneNumber};
     </update>
 

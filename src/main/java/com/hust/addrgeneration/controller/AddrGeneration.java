@@ -40,6 +40,12 @@ public class AddrGeneration {
         return userService.FilterUsers(offset, limit, content);
     }
 
+    // 修改用户
+    @PostMapping(value="/admin/user")
+    public ResponseEntity<?> updateUser(@RequestBody User user) throws Exception {
+        return iPv6AddrService.updateUser(user);
+    }
+
     // 删除用户
     @DeleteMapping(value="/admin/user")
     public ResponseEntity<?> deleteUser(@RequestParam("phoneNumber") String phoneNumber) throws Exception{

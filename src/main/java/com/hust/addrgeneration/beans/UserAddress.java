@@ -1,6 +1,7 @@
 package com.hust.addrgeneration.beans;
 
 public class UserAddress extends User{
+    private String nid;
     private String address;
     private long registerTime;
     private String prefix;
@@ -27,5 +28,13 @@ public class UserAddress extends User{
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;
+    }
+
+    public String getNid() {
+        return nid;
+    }
+
+    public void setNid(String nid) {
+        this.nid = nid;
     }
 }
