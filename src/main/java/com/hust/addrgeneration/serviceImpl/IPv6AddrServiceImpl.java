@@ -210,7 +210,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         prefix64.deleteCharAt(prefix64.length() - 1);
         String generateAddr = String.valueOf(prefix64);
         try{
-            userMapper.updateAIDTrunc(generateAddr.replace(":",""), visibleAID, hiddenAID, timeDifference, phoneNumber, currentTime, prefix, 1);
+            userMapper.updateAIDTrunc(AddressUtils.displayAddress(generateAddr),generateAddr.replace(":",""), visibleAID, hiddenAID, timeDifference, phoneNumber, currentTime, prefix, 1);
         } catch (Exception e){
             return response.responseError(10003);
         }
