@@ -39,7 +39,7 @@ public class ErrorUtils {
             case 10015:
                 return "手机号已经被注册";
             case 10016:
-                return "查询的IPv6地址不存在";
+                return "待溯源的IPv6地址不存在";
             case 10017:
                 return "此手机号还未生成NID";
             case 10018:
@@ -50,6 +50,10 @@ public class ErrorUtils {
                 return "重新生成地址失败";
             case 10021:
                 return "批量获取地址失败";
+            case 10022:
+                return "此手机号未生成对应的IPv6地址（或者地址已被删除）";
+            case 10023:
+                return "查询地址失败";
             default:
                 return "Unknown";
         }

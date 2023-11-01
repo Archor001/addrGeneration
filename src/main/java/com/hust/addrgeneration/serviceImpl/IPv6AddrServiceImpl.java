@@ -91,6 +91,11 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     public ResponseEntity<?> updateUser(User user) throws Exception {
         GenerateAddressResponse response = new GenerateAddressResponse();
 
+        int ispLength = ispPrefix.getLength();
+        if(ispLength == 0){
+            return response.responseError(10018);
+        }
+
         String phoneNumber = user.getPhoneNumber();
         String username = user.getUsername();
         String password = user.getPassword();
@@ -231,6 +236,11 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     public ResponseEntity<?> queryAddr(String phoneNumber) throws Exception {
         QueryAddressResponse response = new QueryAddressResponse();
 
+        int ispLength = ispPrefix.getLength();
+        if(ispLength == 0){
+            return response.responseError(10018);
+        }
+
         List<String> rntAddressList = new ArrayList<>();
 
         if(phoneNumber.contains(",")){
@@ -240,10 +250,10 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
                 try{
                     addressList = userMapper.queryAIDTruncAddress(phone);
                 } catch (Exception e){
-                    return response.responseError(10015);
+                    return response.responseError(10023);
                 }
-                if(addressList.size() <= 0){
-                    response.responseError(10015);
+                if(addressList.isEmpty()){
+                    return response.responseError(10022);
                 }
                 String[] addressArray = addressList.stream().map(Address::getAddress).toArray(String[]::new);
                 String addressStr = String.join(",", addressArray);
@@ -254,10 +264,10 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             try{
                 addressList = userMapper.queryAIDTruncAddress(phoneNumber);
             } catch (Exception e){
-                return response.responseError(10015);
+                return response.responseError(10023);
             }
-            if(addressList.size() <= 0){
-                response.responseError(10015);
+            if(addressList.isEmpty()){
+                return response.responseError(10022);
             }
             String[] addressArray = addressList.stream().map(Address::getAddress).toArray(String[]::new);
             String addressStr = String.join(",", addressArray);
@@ -276,12 +286,11 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     @Override
     public ResponseEntity<?> traceAddr(String queryAddress) throws Exception {
         TraceAddressResponse response = new TraceAddressResponse();
-
         // step1. revert AID
-        queryAddress = AddressUtils.parseAddressToString(queryAddress, 16);
+        String addressAID = AddressUtils.parseAddressToString(queryAddress, 16);
         int timeDifference = 0;
         try{
-            timeDifference = userMapper.queryAIDTruncTime(queryAddress);
+            timeDifference = userMapper.queryAIDTruncTime(addressAID);
         } catch (Exception e) {
             return response.responseError(10016);
         }
@@ -289,7 +298,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         if(prefixLength == 0){
             return response.responseError(10018);
         }
-        String visibleAID = queryAddress.substring(prefixLength,16);
+        String visibleAID = addressAID.substring(prefixLength,16);
         String hiddenAID = userMapper.queryAIDTruncHiddenAID(visibleAID,timeDifference);
         String AID = visibleAID + hiddenAID;
         // step2. use prefix of the IPv6-address and calculate time-Hash to get key
@@ -326,16 +335,17 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         long registerTime = (baseTime + timeInfo);
 
         User userInfo = userMapper.queryRegisterInfo(nid);
-        UserAddress userAddress = new UserAddress();
-
-        userAddress.setPhoneNumber(userInfo.getPhoneNumber());
-        userAddress.setUserID(userInfo.getUserID());
-        userAddress.setUsername(userInfo.getUsername());
-        userAddress.setRegisterTime(registerTime);
+        UserTrace userTrace = new UserTrace();
+        userTrace.setRegisterTime(registerTime);
+        userTrace.setUserID(userInfo.getUserID());
+        userTrace.setNid(userInfo.getNid());
+        userTrace.setPhoneNumber(userInfo.getPhoneNumber());
+        userTrace.setStatus(userInfo.getStatus());
+        userTrace.setUsername(userInfo.getUsername());
 
         response.setCode(0);
         response.setMsg("success");
-        response.setUser(userAddress);
+        response.setUser(userTrace);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -343,6 +353,11 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     @Override
     public ResponseEntity<?> filterAddress(int offset, int limit, String content) throws Exception {
         AddressManageResponse response = new AddressManageResponse();
+
+        int ispLength = ispPrefix.getLength();
+        if(ispLength == 0){
+            return response.responseError(10018);
+        }
 
         List<Address> addressList = new ArrayList<>();
         try{

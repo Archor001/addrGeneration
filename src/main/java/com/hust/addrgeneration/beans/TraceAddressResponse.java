@@ -5,12 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 public class TraceAddressResponse extends Response {
-    private UserAddress user;
+    private UserTrace user;
     public TraceAddressResponse(){};
-    public TraceAddressResponse(int code, String msg, UserAddress user) {
+    public TraceAddressResponse(int code, String msg, UserTrace user) {
         super(code, msg);
         this.user = user;
     }
-    public UserAddress getUser() {return user;}
-    public void setUser(UserAddress user) {this.user = user;}
+    public UserTrace getUser() {return user;}
+    public void setUser(UserTrace user) {this.user = user;}
 }
