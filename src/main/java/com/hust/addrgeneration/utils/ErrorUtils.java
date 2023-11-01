@@ -54,6 +54,8 @@ public class ErrorUtils {
                 return "此手机号未生成对应的IPv6地址（或者地址已被删除）";
             case 10023:
                 return "查询地址失败";
+            case 10024:
+                return "修改用户失败";
             default:
                 return "Unknown";
         }

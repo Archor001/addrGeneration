@@ -116,7 +116,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         try{
             userMapper.updateUser(user);
         } catch (Exception e){
-            return response.responseError(10008);
+            return response.responseError(10024);
         }
 
         try{

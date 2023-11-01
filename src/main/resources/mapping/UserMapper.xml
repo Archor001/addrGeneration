@@ -15,7 +15,7 @@
     </select>
 
     <update id="updateUser" parameterType="com.hust.addrgeneration.beans.User">
-        update aid_trunc <set>status = 3</set> where phoneNumber = #{phoneNumber}
+        update aid_trunc <set>status = 3</set> where phoneNumber = #{phoneNumber};
         update user <set>nid = #{nid}, password = #{password}, userID = #{userID}, username = #{username}, status = #{status}</set> where phoneNumber = #{phoneNumber};
     </update>
 
