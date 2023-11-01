@@ -7,7 +7,7 @@
     </insert>
 
     <select id="queryRegisterInfo" parameterType="String" resultType="com.hust.addrgeneration.beans.User">
-        select userID, phoneNumber, password, username, nid from user where nid = #{nid}
+        select userID, phoneNumber, password, username, nid, status from user where nid = #{nid}
     </select>
 
     <select id="queryPhoneNumber" parameterType="String" resultType="com.hust.addrgeneration.beans.User">
