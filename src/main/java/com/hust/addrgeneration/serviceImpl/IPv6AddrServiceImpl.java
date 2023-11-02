@@ -220,10 +220,16 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         BigInteger big1 = new BigInteger(AID, 16);
         BigInteger big2 = new BigInteger(AIDnTH, 16);
         String timeHash = String.format("%016x", big1.xor(big2));
-        String ideaKey = userMapper.getIdeaKey(asAddress, timeHash);
-        if (ideaKey == null) {
+        String ideaKey;
+        try{
+            ideaKey = userMapper.getIdeaKey(asAddress, timeHash);
+            if (ideaKey == null) {
+                return response.responseError(10013);
+            }
+        } catch (Exception e){
             return response.responseError(10013);
         }
+
 
         // step2. use suffix of IPv6-address to get the whole encrypt data(128-bits)
         String prefix = "";
