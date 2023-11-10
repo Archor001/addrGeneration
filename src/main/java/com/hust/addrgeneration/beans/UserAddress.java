@@ -1,6 +1,6 @@
 package com.hust.addrgeneration.beans;
 
-public class UserAddress extends User{
+public class UserAddress{
     private String nid;
     private String address;
     private long registerTime;

@@ -62,19 +62,6 @@ public class UserServiceImpl implements UserService {
             return response.responseError(10010);
         }
         User[] users = userList.toArray(new User[userList.size()]);
-        for(User i : users){
-            String address = i.getAddress();
-            if(address == null || address.isEmpty())
-                continue;
-            StringBuilder sb = new StringBuilder();
-            for(int len=0;len<address.length();len++){
-                if(len > 0 && len % 4 ==0)
-                    sb.append(":");
-                sb.append(address.charAt(len));
-            }
-            String displayAddr = AddressUtils.displayAddress(sb.toString());
-            i.setAddress(displayAddr);
-        }
         int userCount = 0;
         try{
             userCount = userMapper.getUserCountByFilter(content);

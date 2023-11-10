@@ -9,7 +9,6 @@ public class User {
     private String phoneNumber;
     private String username;
     private String nid;
-    private String address;
     private int status;
 
     public String getNid() {
@@ -48,14 +47,6 @@ public class User {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     public int getStatus() {
