@@ -79,7 +79,7 @@
     </select>
 
     <select id="getAddressesByFilter" resultType="com.hust.addrgeneration.beans.Address">
-        select user.username, user.phoneNumber, user.nid, aid_trunc.status, aid_trunc.address, aid_trunc.registerTime from user left join aid_trunc on user.phoneNumber = aid_trunc.phoneNumber
+        select user.username, user.phoneNumber, user.nid, aid_trunc.status, aid_trunc.address, aid_trunc.registerTime from aid_trunc left join user on user.phoneNumber = aid_trunc.phoneNumber
         where user.username LIKE CONCAT('%',#{content},'%') OR user.phoneNumber LIKE CONCAT('%',#{content},'%') LIMIT #{limit} OFFSET #{offset}
     </select>
 

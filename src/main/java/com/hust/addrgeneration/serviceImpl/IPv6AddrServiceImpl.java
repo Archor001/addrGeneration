@@ -345,6 +345,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         AddressManageResponse response = new AddressManageResponse();
 
         List<Address> addressList = new ArrayList<>();
+        if(limit == 0) limit = 1000;
         try{
             addressList = userMapper.getAddressesByFilter(offset, limit, content);
         } catch (Exception e){

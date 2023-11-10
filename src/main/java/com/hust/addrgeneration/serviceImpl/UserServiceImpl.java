@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
         }
 
         List<User> userList = new ArrayList<User>();
-
+        if(limit == 0) limit = 1000;
         try{
             userList = userMapper.getUsersByFilter(offset, limit, content);
         } catch (Exception e) {
