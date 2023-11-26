@@ -7,7 +7,7 @@
     </insert>
 
     <update id="suspendUser" parameterType="String">
-        update user <set> status = 2 </set> where nid = #{userContent} or username = #{userContent}
+        update user <set> status = 2 </set> where nid = #{nid}
     </update>
 
     <update id="deleteUser" parameterType="String">

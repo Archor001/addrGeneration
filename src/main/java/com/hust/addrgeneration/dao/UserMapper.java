@@ -12,7 +12,7 @@ import java.util.List;
 public interface UserMapper {
     // register表
     void register(String nid, String password, String username, String phoneNumber, String name, String emailAddress, int role, int status);
-    void suspendUser(String userContent);       // 停用用户，设置status字段为2
+    void suspendUser(String nid);               // 停用用户，设置status字段为2
     void deleteUser(String userContent);        // 标记删除用户，设置status字段为3
     void updateUser(User infoBean);
     User getUser(String nid);
