@@ -9,5 +9,5 @@ public interface IPv6AddrService {
     ResponseEntity<?> queryAddress(String nid) throws Exception;
     ResponseEntity<?> traceAddress(String queryAddress) throws Exception;
     ResponseEntity<?> deleteAddress(String address) throws Exception;
-    ResponseEntity<?> suspendAddress(String address) throws Exception;
+    ResponseEntity<?> suspendAddress(Address address) throws Exception;
 }

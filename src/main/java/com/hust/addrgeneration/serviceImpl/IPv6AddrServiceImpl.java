@@ -283,11 +283,12 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
 
     // 地址停用
     @Override
-    public ResponseEntity<?> suspendAddress(String address) throws Exception {
+    public ResponseEntity<?> suspendAddress(Address address) throws Exception {
         Response response = new Response();
 
-        int pos = getIndexOf(address, ":", 4);
-        String aidStr = address.substring(pos+1);
+        String suspendAddr = address.getAddress();
+        int pos = getIndexOf(suspendAddr, ":", 4);
+        String aidStr = suspendAddr.substring(pos+1);
         aidStr = parseAddressSuffix(aidStr, 16);
         String AID = aidStr.replace(":","");
 

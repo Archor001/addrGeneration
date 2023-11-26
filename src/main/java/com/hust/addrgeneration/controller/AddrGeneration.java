@@ -40,7 +40,7 @@ public class AddrGeneration {
 
     // 停用用户
     @PostMapping(value = "/user/suspend")
-    public ResponseEntity<?> suspendUser(@RequestBody String nid) throws Exception {return userService.suspendUser(nid);}
+    public ResponseEntity<?> suspendUser(@RequestBody User userInfo) throws Exception {return userService.suspendUser(userInfo);}
 
     // 删除用户(支持批量)
     @DeleteMapping(value = "/user")
@@ -73,7 +73,7 @@ public class AddrGeneration {
 
     // 地址停用
     @PostMapping(value = "/address/suspend")
-    public ResponseEntity<?> suspendAddress(@RequestBody String address) throws Exception {return iPv6AddrService.suspendAddress(address);}
+    public ResponseEntity<?> suspendAddress(@RequestBody Address address) throws Exception {return iPv6AddrService.suspendAddress(address);}
 
     // 地址删除
     @DeleteMapping(value = "/address")

@@ -130,8 +130,10 @@ public class UserServiceImpl implements UserService {
 
     // 停用用户
     @Override
-    public ResponseEntity<?> suspendUser(String nid) throws Exception {
+    public ResponseEntity<?> suspendUser(User infoBean) throws Exception {
         Response response = new Response();
+
+        String nid = infoBean.getNid();
         try{
             userMapper.suspendUser(nid);
         } catch (Exception e){
