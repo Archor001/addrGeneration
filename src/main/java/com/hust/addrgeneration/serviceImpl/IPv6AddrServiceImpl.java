@@ -129,7 +129,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         for (int i = 0; i < AID.length(); i+=4) {
             suffix.append(AID, i, i + 4).append(":");
         }
-        String address = "2001:250:4000:4507:" + suffix.substring(0,suffix.length()-1);
+        String address = "2001:253:219:2222:" + suffix.substring(0,suffix.length()-1);
 
         try{
             userMapper.updateAID(AIDnTH, big1.toString(16), AID, nid, registerTime, address, 1);
