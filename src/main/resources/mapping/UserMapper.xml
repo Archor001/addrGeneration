@@ -85,7 +85,7 @@
     </select>
 
     <select id="getAddressCountByFilter" parameterType="String" resultType="int">
-        select COUNT(*) from user left join aid_trunc on user.phoneNumber = aid_trunc.phoneNumber
+        select COUNT(*) from user right join aid_trunc on user.phoneNumber = aid_trunc.phoneNumber
         where user.username LIKE CONCAT('%',#{content},'%') OR user.phoneNumber LIKE CONCAT('%',#{content},'%')
     </select>
 </mapper>
