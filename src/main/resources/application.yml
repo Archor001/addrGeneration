@@ -8,9 +8,9 @@ server:
 spring:
   datasource:
     username: root
-    url: jdbc:mysql://218.199.84.72:3306/addr5g?allowMultiQueries=true
+    url: jdbc:mysql://218.199.84.168:3306/addr5g?allowMultiQueries=true
     driver-class-name: com.mysql.cj.jdbc.Driver
-    password: 132311
+    password: Admin@123
 
 #mybatis configuration
 mybatis:

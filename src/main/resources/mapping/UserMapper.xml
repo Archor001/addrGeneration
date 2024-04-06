@@ -46,20 +46,20 @@
         values (#{address}, #{aid}, #{visibleAID}, #{hiddenAID}, #{timeDifference}, #{phoneNumber}, #{registerTime}, #{prefix}, #{status})
     </insert>
 
-    <delete id="truncateAIDTrunc">
-        truncate table aid_trunc
-    </delete>
+    <update id="suspendAIDTrunc">
+        update aid_trunc <set>status = 2</set> where status = 1;
+    </update>
 
     <select id="queryAIDTruncHiddenAID" resultType="String">
         select hiddenAID from aid_trunc where visibleAID = #{visibleAID} and timeDifference = #{timeDifference}
     </select>
 
-    <select id="queryAIDTruncTime" resultType="int">
-        select timeDifference from aid_trunc where aid = #{aid}
+    <select id="queryAIDTruncResult" resultType="QueryAIDTrunc">
+        select timeDifference,status from aid_trunc where aid = #{aid}
     </select>
 
     <select id="queryAIDTruncAddress" parameterType="String" resultType="com.hust.addrgeneration.beans.Address">
-        select address,registerTime from aid_trunc where phoneNumber = #{phoneNumber} and status = 1
+        select address,registerTime from aid_trunc where phoneNumber = #{phoneNumber}
     </select>
 
     <select id="getIdeaKey" parameterType="String" resultType="String">

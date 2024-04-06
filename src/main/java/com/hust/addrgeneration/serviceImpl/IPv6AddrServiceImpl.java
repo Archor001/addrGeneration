@@ -288,9 +288,9 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         TraceAddressResponse response = new TraceAddressResponse();
         // step1. revert AID
         String addressAID = AddressUtils.parseAddressToString(queryAddress, 16);
-        int timeDifference = 0;
+        QueryAIDTrunc queryAIDResult;
         try{
-            timeDifference = userMapper.queryAIDTruncTime(addressAID);
+            queryAIDResult = userMapper.queryAIDTruncResult(addressAID);
         } catch (Exception e) {
             return response.responseError(10016);
         }
@@ -299,7 +299,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
             return response.responseError(10018);
         }
         String visibleAID = addressAID.substring(prefixLength,16);
-        String hiddenAID = userMapper.queryAIDTruncHiddenAID(visibleAID,timeDifference);
+        String hiddenAID = userMapper.queryAIDTruncHiddenAID(visibleAID, queryAIDResult.getTimeDifference());
         String AID = visibleAID + hiddenAID;
         // step2. use prefix of the IPv6-address and calculate time-Hash to get key
         String asPrefix = "2001:250:4000:4507";
@@ -337,6 +337,7 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         User userInfo = userMapper.queryRegisterInfo(nid);
         UserTrace userTrace = new UserTrace();
         userTrace.setRegisterTime(registerTime);
+        userTrace.setAddressStatus(queryAIDResult.getStatus());
         userTrace.setUserID(userInfo.getUserID());
         userTrace.setNid(userInfo.getNid());
         userTrace.setPhoneNumber(userInfo.getPhoneNumber());
@@ -430,9 +431,16 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     public ResponseEntity<?> regenAddress() throws Exception {
         Response response = new Response();
 
-        // 截断地址表
+        // 截断地址表(deprecated)
+//        try{
+//            userMapper.truncateAIDTrunc();
+//        } catch (Exception e){
+//            return response.responseError(10020);
+//        }
+
+        // 停用地址
         try{
-            userMapper.truncateAIDTrunc();
+            userMapper.suspendAIDTrunc();
         } catch (Exception e){
             return response.responseError(10020);
         }

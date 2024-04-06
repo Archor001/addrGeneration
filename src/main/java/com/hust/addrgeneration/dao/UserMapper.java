@@ -1,6 +1,7 @@
 package com.hust.addrgeneration.dao;
 
 import com.hust.addrgeneration.beans.Address;
+import com.hust.addrgeneration.beans.QueryAIDTrunc;
 import com.hust.addrgeneration.beans.User;
 import org.springframework.stereotype.Repository;
 
@@ -25,9 +26,10 @@ public interface UserMapper {
     // aid_trunc表
     void updateAIDTrunc(String address, String aid, String visibleAID, String hiddenAID, int timeDifference, String phoneNumber, long registerTime, String prefix, int status);    // aid_trunc表，新增
     String queryAIDTruncHiddenAID(String visibleAID, int timeDifference);  // aid_trunc表，获取visibleAID、timeDifference对应的hiddenAID
-    int queryAIDTruncTime(String aid);       // aid_trunc表，获取address对应的timeDifference
+    QueryAIDTrunc queryAIDTruncResult(String aid);       // aid_trunc表，获取address对应的timeDifference
     List<Address> queryAIDTruncAddress(String phoneNumber);       // 查询phoneNumber对应的address
     void truncateAIDTrunc();                // 截断地址表
+    void suspendAIDTrunc();
 
 
     // key_info表
