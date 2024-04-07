@@ -287,6 +287,11 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     public ResponseEntity<?> traceAddr(String queryAddress) throws Exception {
         TraceAddressResponse response = new TraceAddressResponse();
         // step1. revert AID
+        int fourthColonIndex = queryAddress.indexOf(':',queryAddress.indexOf(':', queryAddress.indexOf(':', queryAddress.indexOf(':') + 1) + 1) + 1);
+        // If the fourth colon is found, modify queryAddress
+        if (fourthColonIndex != -1) {
+            queryAddress = queryAddress.substring(0, fourthColonIndex);
+        }
         String addressAID = AddressUtils.parseAddressToString(queryAddress, 16);
         QueryAIDTrunc queryAIDResult;
         try{
