@@ -404,11 +404,12 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         } else {
             length = AddressUtils.getAddressBitLength(ispStr);
         }
-        // 如果ISP发生了变化，重新生成地址
+
         if(ispPrefix.getIsp() != ispStr || ispPrefix.getLength() != length){
             ispPrefix.setIsp(ispStr);
             ispPrefix.setLength(length);
-            this.regenAddress();
+            // 如果ISP发生了变化，重新生成地址
+            // this.regenAddress();
         }
         response.setCode(0);
         response.setMsg("success");
