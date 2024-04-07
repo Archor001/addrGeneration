@@ -24,7 +24,8 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
     private float syncGap = 24;
 
     @Autowired
-    public IPv6AddrServiceImpl(UserMapper userMapper) {
+    public IPv6AddrServiceImpl(UserMapper userMapper, Custom custom) {
+        this.ispPrefix = new ISP(custom.getIsp(),custom.getIspLength());
         this.userMapper = userMapper;
     }
 
