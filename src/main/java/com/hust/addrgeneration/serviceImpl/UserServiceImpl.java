@@ -27,7 +27,8 @@ public class UserServiceImpl implements UserService {
     private ISP ispPrefix = ISPUtils.ispPrefix;
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    public UserServiceImpl(UserMapper userMapper) {
+    public UserServiceImpl(UserMapper userMapper, Custom custom) {
+        this.ispPrefix = new ISP(custom.getIsp(),custom.getIspLength());
         this.userMapper = userMapper;
     }
 

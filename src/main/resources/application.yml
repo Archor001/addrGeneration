@@ -20,3 +20,5 @@ mybatis:
 custom:
   admin: root
   password: addr5g
+  isp: 240c:cc02:ffff
+  ispLength: 48
