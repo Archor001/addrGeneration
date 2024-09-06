@@ -30,7 +30,7 @@ public interface UserMapper {
     List<Address> queryAIDTruncAddress(String phoneNumber);       // 查询phoneNumber对应的address
     void truncateAIDTrunc();                // 截断地址表
     void suspendAIDTrunc();
-
+    void deleteAIDTruncAddress(String address);
 
     // key_info表
     String getIdeaKey(String timeHash, String addrGenIP);   // key表，获取密钥

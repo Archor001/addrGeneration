@@ -388,6 +388,20 @@ public class IPv6AddrServiceImpl implements IPv6AddrService {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    // 删除地址
+    @Override
+    public ResponseEntity<?> deleteAddr(String address) throws Exception {
+        Response response = new Response();
+        try{
+            userMapper.deleteAIDTruncAddress(address);
+        } catch (Exception e){
+            return response.responseError(10025);
+        }
+        response.setCode(0);
+        response.setMsg("success");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     // 修改ISP(更新ISP+重新生成地址)
     @Override
     public ResponseEntity<?> updateISP(ISP isp) throws Exception{

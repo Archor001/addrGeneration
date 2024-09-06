@@ -56,6 +56,8 @@ public class ErrorUtils {
                 return "查询地址失败";
             case 10024:
                 return "修改用户失败";
+            case 10025:
+                return "删除地址失败";
             default:
                 return "Unknown";
         }

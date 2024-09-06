@@ -62,6 +62,10 @@
         select address,registerTime from aid_trunc where phoneNumber = #{phoneNumber}
     </select>
 
+    <delete id="deleteAIDTruncAddress" parameterType="String">
+        delete from aid_trunc where address = #{address}
+    </delete>
+
     <select id="getIdeaKey" parameterType="String" resultType="String">
         select ideakey from key_info where addrGenIP = #{addrGenIP} and timehash = #{timeHash}
     </select>

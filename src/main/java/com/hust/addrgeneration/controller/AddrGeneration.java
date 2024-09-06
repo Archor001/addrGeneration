@@ -64,6 +64,12 @@ public class AddrGeneration {
         return iPv6AddrService.queryAddr(phoneNumber);
     }
 
+    // 地址删除
+    @DeleteMapping(value = "/admin/address")
+    public ResponseEntity<?> deleteAddress(@RequestParam("address") String address) throws Exception {
+        return iPv6AddrService.deleteAddr(address);
+    }
+
     // 地址溯源
     @GetMapping(value = "/admin/address")
     public ResponseEntity<?> traceAddress(@RequestParam("queryAddress") String queryAddress) throws Exception {
